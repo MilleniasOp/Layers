@@ -1,0 +1,239 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam roundcorner 5
+skinparam class {
+    BackgroundColor Beige
+    ArrowColor #2A5D9A
+    BorderColor #2A5D9A
+}
+' --- Models ---
+
+class User {
+    - username: String
+    - password: String
+    - role: String
+    + User(username: String, password: String, role: String)
+    + getUsername(): String
+    + getPassword(): String
+    + getRole(): String
+}
+
+class Owner {
+    + Owner(username: String, password: String)
+
+}
+
+class Products {
+    - name: String
+    - cost: float
+    + Products(name: String, cost: float)
+    + getName(): String
+    + getCost(): float
+    + setName(name: String): void
+    + setCost(cost: float): void
+    + toString(): String
+}
+
+class Recipes {
+    - recipeId: String
+    - productName: String
+    - ingredients: List<String>
+    - measurements: List<String>
+    + Recipes(productName: String, ingredients: List<String>, measurements: List<String>)
+    + getProductName(): String
+    + getIngredients(): List<String>
+    + getMeasurements(): List<String>
+    + getRecipeId(): String
+    + setRecipeId(recipeId: String): void
+}
+
+class Task {
+    - taskId: String
+    - description: String
+    - assignedTo: String
+    - status: String
+    - createdDate: LocalDateTime
+    {static} - idCounter: int
+    + Task()
+    + Task(description: String)
+    + Task(description: String, assignedTo: String)
+    - generateTaskId(): String
+    + getTaskId(): String
+    + getDescription(): String
+    + getAssignedTo(): String
+    + getStatus(): String
+    + getCreatedDate(): LocalDateTime
+    + setDescription(description: String): void
+    + setAssignedTo(assignedTo: String): void
+    + setStatus(status: String): void
+    + setTaskId(taskId: String): void
+}
+
+class Reports {
+    + ReportID: String
+    - taskId: String
+    - description: String
+    - assignedTo: String
+    - status: String
+    - createdDate: LocalDateTime
+    {static} - idCounter: int
+    + Reports(task: Task)
+    - generateReportID(): String
+    + getReportID(): String
+    + setReportID(ReportID: String): void
+    + getTaskId(): String
+    + getDescription(): String
+    + getAssignedTo(): String
+    + getStatus(): String
+    + getCreatedDate(): String
+    + toString(): String
+}
+
+' --- Controllers and Utilities ---
+
+class Authenticator {
+    + fetchUsers(): String
+    - parseUsersFromJson(json: String): List<User>
+    - extractStringValue(jsonObject: String, key: String): String
+    + authenticate(username: String, password: String): boolean
+    + getUserRole(username: String): String
+}
+
+class ProductController {
+    {static} + AddNewProduct(product: Products): void
+    {static} - saveProduct(product: Products): void
+    {static} + parseProductsJson(jsonResponse: String): List<String[]>
+    {static} + fetchProducts(): String
+    {static} + showAddProductDialog(parentFrame: JFrame): void
+}
+
+class RecipeController {
+    {static} + addNewRecipe(recipe: Recipes): void
+    {static} - saveRecipe(recipe: Recipes): void
+    {static} - insertIngredients(recipe: Recipes): void
+    {static} - extractIdFromResponse(json: String): String
+    {static} + fetchRecipes(): String
+    {static} + fetchRecipeIngredients(recipeId: String): String
+    {static} + parseRecipeIngredientsJson(jsonResponse: String): List<String[]>
+    {static} + parseRecipesJson(jsonResponse: String): List<String[]>
+    {static} + showAddRecipeDialog(parentFrame: JFrame): void
+}
+
+class ReportsController {
+    {static} + generateReports(username: String): List<Reports>
+    {static} - parseTasksToObjects(jsonResponse: String): List<Task>
+    {static} - extractValue(json: String, key: String): String
+}
+
+class TaskController {
+    {static} + addNewTask(task: Task): void
+    {static} - saveTask(task: Task): void
+    {static} + fetchTasks(): String
+    {static} + updateTaskAssignment(taskId: String, assignedTo: String): void
+    {static} + parseTasksJson(jsonResponse: String): List<String[]>
+    {static} - extractValue(json: String, key: String): String
+    {static} + showAddTaskDialog(): void
+    {static} + showAssignTaskDialog(tasks: List<String[]>): void
+}
+
+class UserController {
+    {static} + fetchEmployees(): String
+    {static} + parseEmployeesJson(jsonResponse: String): List<String[]>
+    {static} - extractValue(json: String, key: String): String
+}
+
+class SupabaseClient {
+    {static} - SUPABASE_URL: String
+    {static} - SUPABASE_KEY: String
+    {static} - DEBUG: boolean
+    {static} - CLIENT: HttpClient
+    {static} - parseBoolean(s: String): boolean
+    {static} - ensureConfigured(): void
+    {static} - baseBuilder(pathWithQuery: String): HttpRequest.Builder
+    {static} - sendWithLogging(req: HttpRequest, requestBody: String): HttpResponse<String>
+    {static} + get(pathWithQuery: String, extraHeaders: Map<String, String>): HttpResponse<String>
+    {static} + post(path: String, body: String, extraHeaders: Map<String, String>): HttpResponse<String>
+    {static} + patch(pathWithQuery: String, body: String, extraHeaders: Map<String, String>): HttpResponse<String>
+    {static} + delete(pathWithQuery: String, extraHeaders: Map<String, String>): HttpResponse<String>
+    {static} + postUpsert(table: String, body: String, onConflictColumns: String, extraHeaders: Map<String, String>): HttpResponse<String>
+    {static} - loadDotEnv(): Map<String, String>
+}
+
+class AuthenticatorUI {
+    {static} + main(args: String[]): void
+    {static} - styleTextField(field: JTextField): void
+}
+
+class OwnerDashBoardUI {
+    {static} - contentPanel: JPanel
+    {static} + main(args: String[]): void
+    {static} - createSidebarButton(text: String): JButton
+    {static} - switchPanel(panel: JPanel): void
+    {static} - createHomePanel(): JPanel
+    {static} - createPage(title: String, buttonText: String, action: Runnable): JPanel
+}
+
+class ProductUI {
+    {static} + createProductPanel(args: String[]): JPanel
+    {static} - createStyledButton(text: String): JButton
+    {static} - refreshTable(table: JTable, header: String[]): void
+}
+
+class RecipeUI {
+    {static} + createRecipePanel(args: String[]): JPanel
+    {static} - createStyledButton(text: String): JButton
+    {static} - refreshTable(table: JTable, header: String[]): void
+}
+
+class ReportsUI {
+    {static} + createReportsPanel(args: String[]): JPanel
+    {static} - createStyledButton(text: String): JButton
+    {static} - refreshTable(table: JTable, header: String[]): void
+}
+
+class TaskUI {
+    {static} + createTaskPanel(args: String[]): JPanel
+    {static} - createStyledButton(text: String): JButton
+    {static} - refreshTable(table: JTable, header: String[]): void
+}
+' --- Relationships ---
+
+Owner -up-|> User
+
+Reports "1" --> "1" Task : "constructed with"
+
+Authenticator "1"..> "0..*" User : "authenticates"
+Authenticator ..> SupabaseClient : "verifies with"
+
+ProductController "1" ..> "0..*" Products : "manages"
+ProductController ..> SupabaseClient : "updates"
+
+RecipeController "1" ..> "0..*" Recipes : "manages"
+RecipeController ..> SupabaseClient : "updates"
+
+ReportsController "1"..> "0..*" Reports : "manages"
+ReportsController "1"..> "1" TaskController : "uses"
+ReportsController ..> SupabaseClient : "updates"
+
+TaskController "1"..> "0..*" Task : "manages"
+TaskController ..> SupabaseClient : "updates"
+
+UserController ..> SupabaseClient : "updates"
+UserController "1"..> "0..*" User : "manages"
+
+AuthenticatorUI "1"..> "1" Authenticator : "uses"
+
+OwnerDashBoardUI ..> ProductUI : "renders"
+OwnerDashBoardUI ..> RecipeUI : "renders"
+OwnerDashBoardUI ..> ReportsUI: "renders"
+OwnerDashBoardUI ..> TaskUI: "renders"
+
+ProductUI ..> ProductController : "uses"
+RecipeUI ..> RecipeController : "uses"
+ReportsUI ..> ReportsController : "uses"
+ReportsUI ..> UserController : "uses"
+
+TaskUI ..> TaskController : "uses"
+
+@enduml

@@ -33,12 +33,14 @@ public class OwnerDashBoardUI {
         JButton productBtn = createSidebarButton("Create Product");
         JButton taskBtn = createSidebarButton("Create Task");
         JButton reportBtn = createSidebarButton("Reports");
+        JButton AddUsers = createSidebarButton("Create User");
 
         sidebar.add(title);
         sidebar.add(recipeBtn);
         sidebar.add(productBtn);
         sidebar.add(taskBtn);
         sidebar.add(reportBtn);
+        sidebar.add(AddUsers);
 
         // Top bar
         JPanel topbar = new JPanel(new BorderLayout());
@@ -83,6 +85,10 @@ public class OwnerDashBoardUI {
 
         reportBtn.addActionListener(e -> switchPanel(createPage("Reports", "Generate Reports", () -> {
             switchPanel(ReportsUI.createReportsPanel(args));
+        })));
+
+        AddUsers.addActionListener(e -> switchPanel(createPage("User Management", "Open User UI", () -> {
+            switchPanel(UserUI.createUserPanel(args));
         })));
 
         logoutBtn.addActionListener(e -> {

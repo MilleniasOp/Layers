@@ -1,4 +1,6 @@
 import java.time.LocalDateTime;
+import java.util.UUID;
+
 
 public class Task {
     private String taskId;
@@ -39,12 +41,9 @@ public class Task {
         this.assignedTo = assignedTo;
     }
 
-    private static int idCounter = 0;
-    private synchronized String generateTaskId() {
-        idCounter++;
-        return "TASK-" + idCounter;
+    private String generateTaskId() {
+        return "TASK-" + UUID.randomUUID().toString();
     }
-
     // Getters
     public String getTaskId() { return taskId; }
     public String getDescription() { return description; }

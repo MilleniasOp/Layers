@@ -1,0 +1,65 @@
+@startuml
+skinparam maxMessageSize 150
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam participant {
+    BackgroundColor White
+    BorderColor #2A5D9A
+}
+skinparam sequence {
+    ArrowColor #2A5D9A
+    LifeLineBorderColor #2A5D9A
+    LifeLineBackgroundColor #EBF4FA
+}
+
+actor "Director" as User
+participant "TaskUI\n<<Boundary>>" as UI
+participant "TaskController\n<<Control>>" as Controller
+participant "Task\n<<Entity>>" as Entity
+participant "SupabaseClient\n<<Proxy>>" as API
+database "Supabase\n<<Database>>" as DB
+
+User -> UI : Click "Create Task"
+activate UI
+
+UI -> Controller : showAddTaskDialog()
+activate Controller
+
+Controller -> UI : Display dialog
+User -> UI : Enter description & assignee\nClick OK
+
+UI -> Controller : Submit task data
+
+alt AssignedTo is empty
+    Controller -> Entity : new Task(description)
+else AssignedTo provided
+    Controller -> Entity : new Task(description, assignedTo)
+end
+
+activate Entity
+Entity --> Controller : Task object
+deactivate Entity
+
+Controller -> Controller : saveTask(task)
+
+Controller -> API : POST /Task (JSON)
+activate API
+
+API -> DB : INSERT INTO Task
+activate DB
+DB --> API : Success
+deactivate DB
+
+API --> Controller : Response
+deactivate API
+
+Controller --> UI : Success
+deactivate Controller
+
+UI -> UI : Show success message
+UI -> UI : Refresh table
+
+UI --> User : Updated task list
+deactivate UI
+
+@enduml

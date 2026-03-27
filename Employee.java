@@ -7,7 +7,6 @@ import java.util.ArrayList;
 public class Employee extends User {
     public Employee(String username, String password) {
         super(username, password, "employee");
-        saveToSupabase(username, password);
     }
 
     public List<Task> viewTasks() {
@@ -51,29 +50,6 @@ public class Employee extends User {
         }
     }
 
-    private void saveToSupabase(String username, String password) {
-        try {
-            // Create JSON body for the insert
-            String jsonBody = String.format(
-                "{\"username\":\"%s\",\"password\":\"%s\",\"role\":\"employee\"}",
-                escapeJson(username),
-                escapeJson(password)
-            );
-
-            // POST to User table
-            HttpResponse<String> response = SupabaseClient.post("User", jsonBody, null);
-
-            if (response.statusCode() >= 200 && response.statusCode() < 300) {
-                System.out.println("Employee saved to Supabase successfully.");
-            } else {
-                System.err.println("Failed to save employee to Supabase. Status: " + response.statusCode());
-                System.err.println("Response: " + response.body());
-            }
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Error saving employee to Supabase: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     private String escapeJson(String s) {
         if (s == null) return "";

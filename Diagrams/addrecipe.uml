@@ -1,0 +1,70 @@
+@startuml
+skinparam maxMessageSize 150
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam participant {
+    BackgroundColor White
+    BorderColor #2A5D9A
+}
+skinparam sequence {
+    ArrowColor #2A5D9A
+    LifeLineBorderColor #2A5D9A
+    LifeLineBackgroundColor #EBF4FA
+}
+
+actor "Director" as User
+participant "RecipeUI\n<<Boundary>>" as UI
+participant "RecipeController\n<<Control>>" as Controller
+participant "Recipes\n<<Entity>>" as Entity
+participant "SupabaseClient\n<<Proxy>>" as API
+database "Supabase\n<<Database>>" as DB
+
+User -> UI : Enters data & clicks "Create Recipe"
+activate UI
+
+UI -> Controller : addNewRecipe(product, ingredients, measurements)
+activate Controller
+
+Controller -> Entity : create Recipes(...)
+activate Entity
+Entity --> Controller : Recipe object
+deactivate Entity
+
+Controller -> Controller : saveRecipe(recipe)
+
+Controller -> API : POST /recipes
+activate API
+
+API -> DB : INSERT INTO recipes
+activate DB
+DB --> API : recipe_id
+deactivate DB
+
+API --> Controller : JSON response
+deactivate API
+
+Controller -> Entity : setRecipeId(recipeId)
+
+loop For each ingredient
+    Controller -> API : POST /recipe_ingredients
+    activate API
+
+    API -> DB : INSERT ingredient
+    activate DB
+    DB --> API : Success
+    deactivate DB
+
+    API --> Controller : Response
+    deactivate API
+end
+
+Controller --> UI : Success
+deactivate Controller
+
+UI -> UI : Show success message
+UI -> UI : Refresh table
+
+UI --> User : Updated recipe list
+deactivate UI
+
+@enduml

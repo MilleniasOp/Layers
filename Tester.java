@@ -9,6 +9,11 @@ public class Tester {
         for (Reports r : reports) {
             System.out.println(r); // uses toString()
         }
+
+        String Workers = UserController.fetchWorkers();
+        System.out.println(Workers);
+        List<String[]> list = UserController.parseWorkersJson(Workers);
+        System.out.println(list);        
     
     }
 }
