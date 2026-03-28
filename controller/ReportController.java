@@ -1,8 +1,14 @@
+package controller;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+
+import entity.Report;
+import entity.Task;
+import utils.SupabaseClient;
+
 import java.awt.*;
 
 import java.io.IOException;
@@ -10,11 +16,11 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReportsController {
+public class ReportController {
 
-    public static List<Reports> generateReports(String username) {
+    public static List<Report> generateReports(String username) {
 
-        List<Reports> reportsList = new ArrayList<>();
+        List<Report> reportsList = new ArrayList<>();
 
         try {
             String path = "Task?assignedTo=eq." + username;
@@ -29,7 +35,7 @@ public class ReportsController {
 
 
                 for (Task task : tasks) {
-                    Reports report = new Reports(task);
+                    Report report = new Report(task);
                     reportsList.add(report);
                 }
 

@@ -1,11 +1,12 @@
-public class Products {
+package entity;
+public class Product {
     private String name;
     private float cost;
 
     /**
      * Default constructor
      */
-    public Products() {
+    public Product() {
         this.name = "";
         this.cost = 0;
     }
@@ -15,7 +16,7 @@ public class Products {
      * @param name the product name
      * @param cost the product cost
      */
-    public Products(String name, float cost) {
+    public Product(String name, float cost) {
         this.name = name;
         this.cost = cost;
     }

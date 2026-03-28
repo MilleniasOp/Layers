@@ -1,8 +1,14 @@
+package controller;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+
+import entity.Task;
+import utils.SupabaseClient;
+import utils.UIUtils;
+
 import java.awt.*;
 
 public class TaskController {

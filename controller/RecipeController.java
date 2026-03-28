@@ -1,3 +1,4 @@
+package controller;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -8,15 +9,19 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import entity.Recipe;
+import utils.SupabaseClient;
+import utils.UIUtils;
+
 import java.awt.*;
 
 public class RecipeController {
 
-    public static void addNewRecipe(Recipes recipe) {
+    public static void addNewRecipe(Recipe recipe) {
         saveRecipe(recipe);
     }
 
-    private static void saveRecipe(Recipes recipe) {
+    private static void saveRecipe(Recipe recipe) {
         try {
             // Step 1: Create JSON for recipe
             String json = String.format(
@@ -63,7 +68,7 @@ public class RecipeController {
             e.printStackTrace();
         }
     }
-    private static void insertIngredients(Recipes recipe) {
+    private static void insertIngredients(Recipe recipe) {
         try {
             for (int i = 0; i < recipe.getIngredients().size(); i++) {
 
@@ -338,7 +343,7 @@ public class RecipeController {
             }
 
             try {
-                Recipes r = new Recipes(productName, ingredients, measurements);
+                Recipe r = new Recipe(productName, ingredients, measurements);
                 addNewRecipe(r);
                 UIUtils.showMessage(dialog, "Success", "Recipe created successfully!");
                 dialog.dispose();

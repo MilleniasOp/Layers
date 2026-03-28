@@ -1,10 +1,17 @@
+package boundary.tabs;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import controller.ReportController;
+import controller.UserController;
+import entity.Report;
+import utils.UIUtils;
+
 import java.awt.*;
 import java.util.List;
 
-public class ReportsUI {
+public class ReportUI {
 
     public static JPanel createReportsPanel(String[] args) {
 
@@ -49,7 +56,7 @@ public class ReportsUI {
             if (selectedRow != -1) {
 
                 String username = (String) table.getValueAt(selectedRow, 0);
-                List<Reports> reports = ReportsController.generateReports(username);
+                List<Report> reports = ReportController.generateReports(username);
 
                 // ===== MODERN DIALOG =====
                 JDialog dialog = new JDialog(
@@ -79,7 +86,7 @@ public class ReportsUI {
                 String[][] tableData = new String[reports.size()][5];
 
                 for (int i = 0; i < reports.size(); i++) {
-                    Reports r = reports.get(i);
+                    Report r = reports.get(i);
 
                     tableData[i][0] = r.getReportID();
                     tableData[i][1] = r.getTaskId();

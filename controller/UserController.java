@@ -1,9 +1,17 @@
+package controller;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import entity.Employee;
+import entity.Owner;
+import entity.Customer;
+
+import utils.SupabaseClient;
+import utils.UIUtils;
 
 import java.awt.*;
 

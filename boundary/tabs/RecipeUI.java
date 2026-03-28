@@ -1,6 +1,12 @@
+package boundary.tabs;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import boundary.pages.OwnerDashBoardUI;
+import controller.RecipeController;
+import utils.UIUtils;
+
 import java.awt.*;
 import java.util.List;
 
@@ -25,12 +31,10 @@ public class RecipeUI {
         JButton addBtn = createStyledButton("➕ Add");
         JButton refreshBtn = createStyledButton("🔄 Refresh");
         JButton viewBtn = createStyledButton("👁 View");
-        JButton backBtn = createStyledButton("⬅ Back");
 
         buttonPanel.add(addBtn);
         buttonPanel.add(refreshBtn);
         buttonPanel.add(viewBtn);
-        buttonPanel.add(backBtn);
 
         topPanel.add(title, BorderLayout.WEST);
         topPanel.add(buttonPanel, BorderLayout.EAST);
@@ -78,12 +82,6 @@ public class RecipeUI {
             } else {
                 UIUtils.showMessage(mainPanel, "Warning", "Select a recipe first.");
             }
-        });
-
-        backBtn.addActionListener(e -> {
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(mainPanel);
-            topFrame.dispose();
-            OwnerDashBoardUI.main(args);
         });
 
         // ===== ADD TO MAIN =====

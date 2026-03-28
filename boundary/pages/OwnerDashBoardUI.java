@@ -1,5 +1,13 @@
+package boundary.pages;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import boundary.tabs.ProductUI;
+import boundary.tabs.RecipeUI;
+import boundary.tabs.ReportUI;
+import boundary.tabs.TaskUI;
+import boundary.tabs.UserUI;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -8,7 +16,7 @@ public class OwnerDashBoardUI {
 
     private static JPanel contentPanel;
 
-    public static void main(String[] args) {
+    public void run() {
 
         JFrame frame = new JFrame("Director Dashboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,28 +80,28 @@ public class OwnerDashBoardUI {
 
         // Navigation logic
         recipeBtn.addActionListener(e -> switchPanel(createPage("Recipe Management", "Open Recipe UI", () -> {
-            switchPanel(RecipeUI.createRecipePanel(args));
+            switchPanel(RecipeUI.createRecipePanel(null));
         })));
 
         productBtn.addActionListener(e -> switchPanel(createPage("Product Management", "Open Product UI", () -> {
-            switchPanel(ProductUI.createProductPanel(args));
+            switchPanel(ProductUI.createProductPanel(null));
         })));
 
         taskBtn.addActionListener(e -> switchPanel(createPage("Task Management", "Open Task UI", () -> {
-            switchPanel(TaskUI.createTaskPanel(args));
+            switchPanel(TaskUI.createTaskPanel(null));
         })));
 
         reportBtn.addActionListener(e -> switchPanel(createPage("Reports", "Generate Reports", () -> {
-            switchPanel(ReportsUI.createReportsPanel(args));
+            switchPanel(ReportUI.createReportsPanel(null));
         })));
 
         AddUsers.addActionListener(e -> switchPanel(createPage("User Management", "Open User UI", () -> {
-            switchPanel(UserUI.createUserPanel(args));
+            switchPanel(UserUI.createUserPanel(null));
         })));
 
         logoutBtn.addActionListener(e -> {
             frame.dispose();
-            AuthenticatorUI.main(args);
+            (new AuthenticatorUI()).run();
         });
     }
 

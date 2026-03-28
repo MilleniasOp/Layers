@@ -1,12 +1,16 @@
 import java.util.List;
 
+import controller.ReportController;
+import controller.UserController;
+import entity.Report;
+
 public class Tester {
     public static void main (String[] args){
-        List<Reports> reports = ReportsController.generateReports("john_doe");
+        List<Report> reports = ReportController.generateReports("john_doe");
 
         System.out.println("Total reports: " + reports.size());
 
-        for (Reports r : reports) {
+        for (Report r : reports) {
             System.out.println(r); // uses toString()
         }
 

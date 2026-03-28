@@ -1,12 +1,24 @@
+package boundary.pages;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import controller.Authenticator;
+import utils.UIUtils;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.function.Consumer;
 
 public class AuthenticatorUI {
 
-    public static void main(String[] args) {
+    private Consumer<String> authSuccessCallback;
+
+    public void setAuthSuccessCallback(Consumer<String> authSuccessCallback) {
+        this.authSuccessCallback = authSuccessCallback;
+    }
+
+    public void run() {
 
         JFrame frame = new JFrame("Authenticator");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -127,17 +139,12 @@ public class AuthenticatorUI {
                 UIUtils.showMessage(frame, "Success", "Login successful!");
                 String role = auth.getUserRole(username);
 
+                if (authSuccessCallback != null) {
+                    authSuccessCallback.accept(role);
+                }
+
                 frame.setVisible(false);
 
-                if ("director".equals(role)) {
-                    OwnerDashBoardUI.main(args);
-                } else if ("employee".equals(role)) {
-                    JOptionPane.showMessageDialog(frame, "Employee UI not implemented yet");
-                } else if ("manager".equals(role)) {
-                    JOptionPane.showMessageDialog(frame, "Manager UI not implemented yet");
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Unknown role: " + role);
-                }
 
             } else {
                 UIUtils.showMessage(frame, "Error", "Invalid credentials.");

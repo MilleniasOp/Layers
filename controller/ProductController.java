@@ -1,3 +1,4 @@
+package controller;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -5,16 +6,20 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import entity.Product;
+import utils.SupabaseClient;
+import utils.UIUtils;
+
 import java.awt.*;
 
 
 public class ProductController {
 
-    public static void AddNewProduct(Products product){
+    public static void AddNewProduct(Product product){
         saveProduct(product);
     }
 
-    private static void saveProduct(Products product) {
+    private static void saveProduct(Product product) {
         try {
             // Create JSON body for the insert
             String jsonBody = String.format(
@@ -132,7 +137,7 @@ public class ProductController {
             }
 
             try{
-                Products p = new Products(name,cost);
+                Product p = new Product(name,cost);
                 AddNewProduct(p);
                 UIUtils.showMessage(dialog, "Success", "Product created successfully!");
                 dialog.dispose();

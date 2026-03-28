@@ -1,6 +1,7 @@
+package entity;
 import java.time.LocalDateTime;
 
-public class Reports{
+public class Report{
     public String ReportID;
     private String taskId;
     private String description;
@@ -8,7 +9,7 @@ public class Reports{
     private String status;
     private LocalDateTime createdDate;    
 
-    public Reports(Task task){
+    public Report(Task task){
         this.ReportID = generateReportID();
         this.taskId = task.getTaskId();
         this.description = task.getDescription();

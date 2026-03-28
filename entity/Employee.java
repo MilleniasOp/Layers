@@ -1,6 +1,10 @@
+package entity;
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.List;
+
+import utils.SupabaseClient;
+
 import java.util.ArrayList;
 
 

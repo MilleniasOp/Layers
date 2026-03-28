@@ -1,6 +1,10 @@
+package boundary.tabs;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+
+import controller.TaskController;
+
 import java.awt.*;
 import java.util.List;
 
