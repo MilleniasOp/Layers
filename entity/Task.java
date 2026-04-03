@@ -9,6 +9,7 @@ public class Task {
     private String assignedTo;
     private String status;
     private LocalDateTime createdDate;
+    private String completedPeriod;
 
     /**
      * Default constructor
@@ -19,6 +20,7 @@ public class Task {
         this.assignedTo = "";
         this.status = "Pending";
         this.createdDate = LocalDateTime.now();
+        this.completedPeriod = null;
     }
 
     /**
@@ -51,6 +53,7 @@ public class Task {
     public String getAssignedTo() { return assignedTo; }
     public String getStatus() { return status; }
     public LocalDateTime getCreatedDate() { return createdDate; }
+    public String getCompletedPeriod() { return completedPeriod; }
 
     // Setters
     public void setDescription(String description) { this.description = description; }

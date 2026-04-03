@@ -7,6 +7,7 @@ import boundary.tabs.RecipeUI;
 import boundary.tabs.ReportUI;
 import boundary.tabs.TaskUI;
 import boundary.tabs.UserUI;
+import boundary.tabs.FinanceUI;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -42,6 +43,7 @@ public class OwnerDashBoardUI {
         JButton taskBtn = createSidebarButton("Create Task");
         JButton reportBtn = createSidebarButton("Reports");
         JButton AddUsers = createSidebarButton("Create User");
+        JButton financeBtn = createSidebarButton("Finance");
 
         sidebar.add(title);
         sidebar.add(recipeBtn);
@@ -49,6 +51,7 @@ public class OwnerDashBoardUI {
         sidebar.add(taskBtn);
         sidebar.add(reportBtn);
         sidebar.add(AddUsers);
+        sidebar.add(financeBtn);
 
         // Top bar
         JPanel topbar = new JPanel(new BorderLayout());
@@ -98,6 +101,11 @@ public class OwnerDashBoardUI {
         AddUsers.addActionListener(e -> switchPanel(createPage("User Management", "Open User UI", () -> {
             switchPanel(UserUI.createUserPanel(null));
         })));
+
+        financeBtn.addActionListener(e -> switchPanel(createPage("Finance Management", "Open Finance UI", () -> {
+            switchPanel(FinanceUI.createFinancePanel(null));
+        })));
+
 
         logoutBtn.addActionListener(e -> {
             frame.dispose();

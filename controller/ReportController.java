@@ -23,9 +23,9 @@ public class ReportController {
         List<Report> reportsList = new ArrayList<>();
 
         try {
-            String path = "Task?assignedTo=eq." + username;
+            String path = "?assignedTo=eq." + username;
 
-            HttpResponse<String> response = SupabaseClient.get(path, null);
+            HttpResponse<String> response = SupabaseClient.Tables.TASKS_TABLE.get(path, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
 

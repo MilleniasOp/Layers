@@ -67,6 +67,43 @@ public class SupabaseClient {
         SUPABASE_KEY = key != null ? key.trim() : "";
         DEBUG = parseBoolean(debugEnv);
     }
+    public static class Tables {
+        public static class Table{
+            String name;
+            Table(String name) {
+                this.name = name;
+            }
+            public HttpResponse<String> get(String pathWithQuery, Map<String, String> extraHeaders) throws IOException, InterruptedException {
+                return SupabaseClient.get(name + pathWithQuery, extraHeaders);
+            }
+            public HttpResponse<String> post(String body, Map<String, String> extraHeaders) throws IOException, InterruptedException {
+                return SupabaseClient.post(name, body, extraHeaders);
+            }
+            public HttpResponse<String> patch(String pathWithQuery, String body, Map<String, String> extraHeaders) throws IOException, InterruptedException {
+                return SupabaseClient.patch(name + pathWithQuery, body, extraHeaders);
+            }
+            public HttpResponse<String> delete(String pathWithQuery, Map<String, String> extraHeaders) throws IOException, InterruptedException {
+                return SupabaseClient.delete(name + pathWithQuery, extraHeaders);
+            }
+            public HttpResponse<String> postUpsert(String body, String onConflictColumns, Map<String, String> extraHeaders) throws IOException, InterruptedException {
+                return SupabaseClient.postUpsert(name, body, onConflictColumns, extraHeaders);
+            }
+        }
+        static final String USERS = "users";
+        static final String ATTENDANCE = "attendance";
+        static final String PAYROLL = "payroll";
+        static final String TASKS = "Task";
+        static final String RECIPES = "recipes";
+        static final String RECIPE_INGREDIENTS = "recipe_ingredients";
+        static final String PRODUCTS = "products";
+        public static final Table USERS_TABLE = new Table(USERS);
+        public static final Table ATTENDANCE_TABLE = new Table(ATTENDANCE);
+        public static final Table PAYROLL_TABLE = new Table(PAYROLL);
+        public static final Table TASKS_TABLE = new Table(TASKS);
+        public static final Table RECIPES_TABLE = new Table(RECIPES);
+        public static final Table RECIPE_INGREDIENTS_TABLE = new Table(RECIPE_INGREDIENTS);
+        public static final Table PRODUCTS_TABLE = new Table(PRODUCTS);
+    }
 
     private static boolean parseBoolean(String s) {
         if (s == null) return false;
@@ -89,6 +126,11 @@ public class SupabaseClient {
                 .header("Authorization", "Bearer " + SUPABASE_KEY)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json");
+    }
+
+    public static HttpResponse<String> rpc(String functionName, String body, Map<String, String> extraHeaders) throws IOException, InterruptedException {
+        String path = "rpc/" + functionName;
+        return post(path, body, extraHeaders);
     }
 
     // central send wrapper to log request/response when DEBUG or on error

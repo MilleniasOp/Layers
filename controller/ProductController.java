@@ -29,7 +29,7 @@ public class ProductController {
             );
 
             // POST to User table
-            HttpResponse<String> response = SupabaseClient.post("Products", jsonBody, null);
+            HttpResponse<String> response = SupabaseClient.Tables.PRODUCTS_TABLE.post(jsonBody, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Product saved to Supabase successfully.");
@@ -94,7 +94,7 @@ public class ProductController {
 
     public static String fetchProducts(){
         try{
-            HttpResponse<String> response = SupabaseClient.get("Products", null);
+            HttpResponse<String> response = SupabaseClient.Tables.PRODUCTS_TABLE.get("", null);
             if (response.statusCode() >= 200 && response.statusCode() < 300){
                 return response.body();
             }else{

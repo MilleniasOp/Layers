@@ -35,7 +35,7 @@ public class RecipeController {
 
             // Step 3: Send POST request
             HttpResponse<String> response =
-                SupabaseClient.post("recipes", json, headers);
+                SupabaseClient.Tables.RECIPES_TABLE.post(json, headers);
 
             System.out.println("RECIPE RESPONSE: " + response.body());
 
@@ -79,7 +79,7 @@ public class RecipeController {
                     recipe.getMeasurements().get(i)
                 );
 
-                SupabaseClient.post("recipe_ingredients", json, null);
+                SupabaseClient.Tables.RECIPE_INGREDIENTS_TABLE.post(json, null);
             }
 
         } catch (Exception e) {
@@ -120,7 +120,7 @@ public class RecipeController {
     }
     public static String fetchRecipes(){
         try {
-            HttpResponse<String> response = SupabaseClient.get("recipes", null);
+            HttpResponse<String> response = SupabaseClient.Tables.RECIPES_TABLE.get("", null);
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 return response.body();
             } else {
@@ -134,7 +134,7 @@ public class RecipeController {
     public static String fetchRecipeIngredients(String recipeId){
         try {
             String path = "recipe_ingredients?recipe_id=eq." + recipeId;
-            HttpResponse<String> response = SupabaseClient.get(path, null);
+            HttpResponse<String> response = SupabaseClient.Tables.RECIPE_INGREDIENTS_TABLE.get(path, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 return response.body();

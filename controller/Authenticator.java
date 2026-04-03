@@ -15,7 +15,7 @@ public class Authenticator {
     public String fetchUsers() {
         try {
             // Fetch all users from the 'User' table in Supabase
-            HttpResponse<String> response = SupabaseClient.get("User", null);
+            HttpResponse<String> response = SupabaseClient.Tables.USERS_TABLE.get("", null);
 
             if (response.statusCode() == 200) {
                 String responseBody = response.body();
@@ -80,7 +80,7 @@ public class Authenticator {
     public boolean authenticate(String username, String password) {
         try {
             // Fetch all users from the 'User' table in Supabase
-            HttpResponse<String> response = SupabaseClient.get("User", null);
+            HttpResponse<String> response = SupabaseClient.Tables.USERS_TABLE.get("", null);
 
             if (response.statusCode() == 200) {
                 String responseBody = response.body();
@@ -106,7 +106,7 @@ public class Authenticator {
     public String getUserRole(String username) {
         try {
             // Fetch all users from the 'User' table in Supabase
-            HttpResponse<String> response = SupabaseClient.get("User", null);
+            HttpResponse<String> response = SupabaseClient.Tables.USERS_TABLE.get("", null);
 
             if (response.statusCode() == 200) {
                 String responseBody = response.body();

@@ -1,10 +1,14 @@
 import boundary.pages.AuthenticatorUI;
 import boundary.pages.OwnerDashBoardUI;
+import utils.SupabaseClient;
+
+import java.io.IOException;
+
 import javax.swing.JOptionPane;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
         AuthenticatorUI authUI = new AuthenticatorUI();
         OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
 

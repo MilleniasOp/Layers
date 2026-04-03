@@ -48,7 +48,7 @@ public class UserController {
             );
 
             // POST to User table
-            HttpResponse<String> response = SupabaseClient.post("User", jsonBody, null);
+            HttpResponse<String> response = SupabaseClient.post("users", jsonBody, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Owner saved to Supabase successfully.");
@@ -72,7 +72,7 @@ public class UserController {
             );
 
             // POST to User table
-            HttpResponse<String> response = SupabaseClient.post("User", jsonBody, null);
+            HttpResponse<String> response = SupabaseClient.post("users", jsonBody, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Employee saved to Supabase successfully.");
@@ -97,7 +97,7 @@ public class UserController {
             );
 
             // POST to User table
-            HttpResponse<String> response = SupabaseClient.post("User", jsonBody, null);
+            HttpResponse<String> response = SupabaseClient.post("users", jsonBody, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Owner saved to Supabase successfully.");
@@ -113,7 +113,7 @@ public class UserController {
 
     public static String fetchWorkers(){
         try{
-            HttpResponse<String> response = SupabaseClient.get("User?role=neq.customer" , null);
+            HttpResponse<String> response = SupabaseClient.get("users?role=neq.customer" , null);
             if (response.statusCode() >= 200 && response.statusCode() < 300){
                 return response.body();
             }else{
@@ -126,7 +126,7 @@ public class UserController {
     }
     public static String fetchEmployees(){
         try{
-            HttpResponse<String> response = SupabaseClient.get("User?role=eq.employee", null);
+            HttpResponse<String> response = SupabaseClient.get("users?role=eq.employee", null);
             if (response.statusCode() >= 200 && response.statusCode() < 300){
                 return response.body();
             }else{

@@ -29,7 +29,7 @@ public class TaskController {
             );
 
             HttpResponse<String> response =
-                SupabaseClient.post("Task", json, null);
+                SupabaseClient.Tables.TASKS_TABLE.post(json, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Task saved successfully.");
@@ -45,7 +45,7 @@ public class TaskController {
     public static String fetchTasks() {
         try {
             HttpResponse<String> response =
-                SupabaseClient.get("Task", null);
+                SupabaseClient.Tables.TASKS_TABLE.get("", null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 return response.body();
@@ -65,10 +65,10 @@ public class TaskController {
                 assignedTo
             );
 
-            String path = "Task?taskId=eq." + taskId;
+            String path = "?taskId=eq." + taskId;
 
             HttpResponse<String> response =
-                SupabaseClient.patch(path, json, null);
+                SupabaseClient.Tables.TASKS_TABLE.patch(path, json, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Task updated.");
