@@ -1,5 +1,7 @@
 import boundary.pages.AuthenticatorUI;
+import boundary.pages.EmployeeDashBoardUI;
 import boundary.pages.OwnerDashBoardUI;
+import boundary.pages.EmployeeDashBoardUI;
 import utils.SupabaseClient;
 
 import java.io.IOException;
@@ -11,6 +13,7 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
         AuthenticatorUI authUI = new AuthenticatorUI();
         OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
+        EmployeeDashBoardUI employeeDashBoardUI = new EmployeeDashBoardUI();
 
         authUI.setAuthSuccessCallback(role -> {
             System.out.println("Authentication successful! Proceeding to the main application...");
@@ -18,7 +21,7 @@ public class Main {
             if ("director".equals(role)) {
                 ownerDashBoardUI.run();
             } else if ("employee".equals(role)) {
-                JOptionPane.showMessageDialog(null, "Employee UI not implemented yet");
+                employeeDashBoardUI.run();
             } else if ("manager".equals(role)) {
                 JOptionPane.showMessageDialog(null, "Manager UI not implemented yet");
             } else {
