@@ -21,7 +21,7 @@ public class Main {
             if ("director".equals(role)) {
                 ownerDashBoardUI.run();
             } else if ("employee".equals(role)) {
-                employeeDashBoardUI.run();
+                employeeDashBoardUI.run(authUI.getAuthenticatedUsername());
             } else if ("manager".equals(role)) {
                 JOptionPane.showMessageDialog(null, "Manager UI not implemented yet");
             } else {

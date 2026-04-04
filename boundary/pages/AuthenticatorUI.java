@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 public class AuthenticatorUI {
 
     private Consumer<String> authSuccessCallback;
+    private String authUsername;
 
     public void setAuthSuccessCallback(Consumer<String> authSuccessCallback) {
         this.authSuccessCallback = authSuccessCallback;
@@ -138,13 +139,14 @@ public class AuthenticatorUI {
             if (isAuthenticated) {
                 UIUtils.showMessage(frame, "Success", "Login successful!");
                 String role = auth.getUserRole(username);
+                this.authUsername = username; // Store authenticated username
 
                 if (authSuccessCallback != null) {
                     authSuccessCallback.accept(role);
                 }
 
                 frame.setVisible(false);
-
+                
 
             } else {
                 UIUtils.showMessage(frame, "Error", "Invalid credentials.");
@@ -162,4 +164,9 @@ public class AuthenticatorUI {
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
     }
+
+    public String getAuthenticatedUsername() {
+        return authUsername;
+    }
+    
 }

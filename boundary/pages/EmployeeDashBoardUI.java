@@ -3,6 +3,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import boundary.tabs.TaskUI;
+import controller.EmployeeController;
+import entity.Employee;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,9 +12,13 @@ import java.awt.event.MouseEvent;
 
 public class EmployeeDashBoardUI {
 
+    EmployeeController employeeController = new EmployeeController();
     private static JPanel contentPanel;
+    private String username;
 
-    public void run() {
+    public void run(String username) {
+        this.username = username;
+        employeeController.clockIn(username);
 
         JFrame frame = new JFrame("Employee Dashboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,6 +79,7 @@ public class EmployeeDashBoardUI {
 
         logoutBtn.addActionListener(e -> {
             frame.dispose();
+            employeeController.clockOut(username); // Replace with actual username
             (new AuthenticatorUI()).run();
         });
     }
