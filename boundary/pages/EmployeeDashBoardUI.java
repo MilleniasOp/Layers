@@ -2,9 +2,11 @@ package boundary.pages;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import boundary.tabs.EmployeeTaskUI;
 import boundary.tabs.TaskUI;
 import controller.EmployeeController;
 import entity.Employee;
+import entity.User;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -16,8 +18,8 @@ public class EmployeeDashBoardUI {
     private static JPanel contentPanel;
     private String username;
 
-    public void run(String username) {
-        this.username = username;
+    public void run(User user) {
+        this.username = user.getUsername();
         employeeController.clockIn(username);
 
         JFrame frame = new JFrame("Employee Dashboard");
@@ -74,7 +76,7 @@ public class EmployeeDashBoardUI {
 
         // Navigation logic
         taskBtn.addActionListener(e -> switchPanel(createPage("Task Management", "Open Task UI", () -> {
-            switchPanel(TaskUI.createTaskPanel(null));
+            switchPanel(EmployeeTaskUI.createTaskPanel(user));
         })));
 
         logoutBtn.addActionListener(e -> {
