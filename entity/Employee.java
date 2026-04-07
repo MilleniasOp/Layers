@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 
 public class Employee extends User {
-    public Employee(String username, String password) {
-        super(username, password, "employee");
+    public Employee(String username, String password, String role, String userId) {
+        super(username, password, "employee", userId);
     }
 
     public List<Task> viewTasks() {

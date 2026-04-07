@@ -33,6 +33,7 @@ public class Authenticator {
                     result.append("  Username: ").append(user.getUsername()).append("\n");
                     result.append("  Password: ").append(user.getPassword()).append("\n");
                     result.append("  Role: ").append(user.getRole()).append("\n");
+                    result.append("  UserId: ").append(user.getUserId()).append("\n");
                     result.append("\n");
                 }
 
@@ -60,8 +61,9 @@ public class Authenticator {
             String username = extractStringValue(objectContent, "username");
             String password = extractStringValue(objectContent, "password");
             String role = extractStringValue(objectContent, "role");
+            String userId = extractStringValue(objectContent, "userId");
 
-            users.add(new User(username, password, role));
+            users.add(new User(username, password, role, userId));
         }
 
         return users;

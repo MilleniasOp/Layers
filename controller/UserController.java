@@ -286,7 +286,7 @@ public class UserController {
             String pass = password.getText();
 
             try{
-                Employee employee = new Employee(name,pass);
+                Employee employee = new Employee(name, pass, pass, pass);
                 AddNewEmployee(employee);
                 UIUtils.showMessage(dialog, "Success", "Employee created successfully!");
                 dialog.dispose();
@@ -328,7 +328,7 @@ public class UserController {
             String pass = password.getText();
 
             try{
-                Owner owner = new Owner(name,pass);
+                Owner owner = new Owner(name, pass, pass, pass);
                 AddNewOwner(owner);
                 UIUtils.showMessage(dialog, "Success", "Director created successfully!");
                 dialog.dispose();
