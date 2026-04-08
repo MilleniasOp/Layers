@@ -98,6 +98,50 @@ public class FinanceController {
         }
     }
 
+    public static double CalculateProfit() {
+        double profit = 0;
+
+        try {
+            var response = SupabaseClient.rpc(
+                "sum_confirmed_orders_total_price",
+                "{}", 
+                null
+            );
+
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                String profitStr = response.body().replaceAll("[^0-9.]", "");
+                profit = Double.parseDouble(profitStr);
+                System.out.println("Profit for the period: " + profit);
+            } else {
+                System.err.println("Failed to calculate profit: " + response.body());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return profit;
+    }
+
+    public static double getTotalPayroll() {
+        double total = 0;
+
+        try {
+            String payrollJson = fetchPayroll();
+            List<String[]> payrollData = parsePayrollJson(payrollJson);
+
+            for (String[] row : payrollData) {
+                total += Double.parseDouble(row[5]); // totalPay column
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }    
+            
+
     private static void savePayrollToFile(List<Payroll> payrollList) {
         try {
             for (Payroll payroll : payrollList) {

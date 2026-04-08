@@ -279,6 +279,11 @@ public class TaskController {
 
     public static void updateTaskStatus(String task_id, String newStatus) {
         try {
+            if (newStatus.equalsIgnoreCase("completed")){
+                String alertMessage = "Task " + task_id + " has been completed.";
+                AlertController.createAlert(alertMessage);
+            }
+            
             // Create JSON body for the update
             String jsonBody = String.format(
                     "{\"status\":\"%s\"}",

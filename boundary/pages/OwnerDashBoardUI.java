@@ -1,17 +1,18 @@
 package boundary.pages;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import boundary.tabs.ProductUI;
 import boundary.tabs.RecipeUI;
 import boundary.tabs.ReportUI;
 import boundary.tabs.TaskUI;
 import boundary.tabs.UserUI;
+import controller.AlertController;
 import boundary.tabs.FinanceUI;
-
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class OwnerDashBoardUI {
 
@@ -21,13 +22,12 @@ public class OwnerDashBoardUI {
 
         JFrame frame = new JFrame("Director Dashboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 550);
+        frame.setSize(1100, 550);
         frame.setLocationRelativeTo(null);
 
-        // Main container
         JPanel mainPanel = new JPanel(new BorderLayout());
 
-        // Sidebar
+        // ================= SIDEBAR =================
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBackground(new Color(30, 30, 30));
@@ -42,7 +42,7 @@ public class OwnerDashBoardUI {
         JButton productBtn = createSidebarButton("Create Product");
         JButton taskBtn = createSidebarButton("Create Task");
         JButton reportBtn = createSidebarButton("Reports");
-        JButton AddUsers = createSidebarButton("Create User");
+        JButton userBtn = createSidebarButton("Create User");
         JButton financeBtn = createSidebarButton("Finance");
 
         sidebar.add(title);
@@ -50,10 +50,10 @@ public class OwnerDashBoardUI {
         sidebar.add(productBtn);
         sidebar.add(taskBtn);
         sidebar.add(reportBtn);
-        sidebar.add(AddUsers);
+        sidebar.add(userBtn);
         sidebar.add(financeBtn);
 
-        // Top bar
+        // ================= TOPBAR =================
         JPanel topbar = new JPanel(new BorderLayout());
         topbar.setBackground(Color.WHITE);
         topbar.setBorder(new EmptyBorder(10, 20, 10, 20));
@@ -61,59 +61,133 @@ public class OwnerDashBoardUI {
         JLabel welcome = new JLabel("Welcome, Director");
         welcome.setFont(new Font("Segoe UI", Font.BOLD, 18));
 
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        rightPanel.setBackground(Color.WHITE);
+
+        JPanel notificationPanel = new JPanel();
+        notificationPanel.setLayout(null); // absolute positioning
+        notificationPanel.setPreferredSize(new Dimension(40, 30));
+        notificationPanel.setOpaque(false);
+
+        JButton notificationBtn = new JButton("🔔");
+        notificationBtn.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
+        notificationBtn.setFocusPainted(false);
+        notificationBtn.setBorderPainted(false);
+        notificationBtn.setContentAreaFilled(false);
+        notificationBtn.setBounds(0, 0, 40, 30);
+
+        JLabel badgeLabel = new JLabel("0");
+        badgeLabel.setForeground(Color.RED);
+        badgeLabel.setFont(new Font("Segoe UI", Font.BOLD, 8));
+        badgeLabel.setOpaque(true);
+        badgeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        // small circle look
+        badgeLabel.setBounds(18, 0, 16, 16);
+
+        // add both
+        notificationPanel.add(notificationBtn);
+        notificationPanel.add(badgeLabel);
+        
         JButton logoutBtn = new JButton("Logout");
-        logoutBtn.setFocusPainted(false);
+
+        rightPanel.add(notificationPanel);
+        rightPanel.add(logoutBtn);
 
         topbar.add(welcome, BorderLayout.WEST);
-        topbar.add(logoutBtn, BorderLayout.EAST);
+        topbar.add(rightPanel, BorderLayout.EAST);
 
-        // Content panel (changes dynamically)
+        // ================= CONTENT =================
         contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(new Color(240, 244, 248));
-
         contentPanel.add(createHomePanel(), BorderLayout.CENTER);
 
-        // Layout assembly
+        // ================= NOTIFICATION DROPDOWN =================
+        JPanel dropdownPanel = new JPanel(new BorderLayout());
+        dropdownPanel.setBackground(Color.WHITE);
+        dropdownPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        dropdownPanel.setBounds(550, 50, 300, 250);
+        dropdownPanel.setVisible(false);
+
+        JLabel header = new JLabel("Notifications");
+        header.setBorder(new EmptyBorder(10, 10, 5, 10));
+        header.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        JTextArea alertArea = new JTextArea();
+        alertArea.setEditable(false);
+
+        JScrollPane scroll = new JScrollPane(alertArea);
+
+        dropdownPanel.add(header, BorderLayout.NORTH);
+        dropdownPanel.add(scroll, BorderLayout.CENTER);
+
+        // ================= LAYERED PANE =================
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setLayout(null);
+
+        contentPanel.setBounds(0, 0, 900, 500);
+        layeredPane.add(contentPanel, JLayeredPane.DEFAULT_LAYER);
+        layeredPane.add(dropdownPanel, JLayeredPane.POPUP_LAYER);
+
+        // ================= ADD TO FRAME =================
         mainPanel.add(sidebar, BorderLayout.WEST);
         mainPanel.add(topbar, BorderLayout.NORTH);
-        mainPanel.add(contentPanel, BorderLayout.CENTER);
+        mainPanel.add(layeredPane, BorderLayout.CENTER);
 
         frame.add(mainPanel);
         frame.setVisible(true);
 
-        // Navigation logic
-        recipeBtn.addActionListener(e -> switchPanel(createPage("Recipe Management", "Open Recipe UI", () -> {
-            switchPanel(RecipeUI.createRecipePanel(null));
-        })));
+        // ================= NAVIGATION =================
+        recipeBtn.addActionListener(e ->
+                switchPanel(RecipeUI.createRecipePanel(null)));
 
-        productBtn.addActionListener(e -> switchPanel(createPage("Product Management", "Open Product UI", () -> {
-            switchPanel(ProductUI.createProductPanel(null));
-        })));
+        productBtn.addActionListener(e ->
+                switchPanel(ProductUI.createProductPanel(null)));
 
-        taskBtn.addActionListener(e -> switchPanel(createPage("Task Management", "Open Task UI", () -> {
-            switchPanel(TaskUI.createTaskPanel(null));
-        })));
+        taskBtn.addActionListener(e ->
+                switchPanel(TaskUI.createTaskPanel(null)));
 
-        reportBtn.addActionListener(e -> switchPanel(createPage("Reports", "Generate Reports", () -> {
-            switchPanel(ReportUI.createReportsPanel(null));
-        })));
+        reportBtn.addActionListener(e ->
+                switchPanel(ReportUI.createReportsPanel(null)));
 
-        AddUsers.addActionListener(e -> switchPanel(createPage("User Management", "Open User UI", () -> {
-            switchPanel(UserUI.createUserPanel(null));
-        })));
+        userBtn.addActionListener(e ->
+                switchPanel(UserUI.createUserPanel(null)));
 
-        financeBtn.addActionListener(e -> switchPanel(createPage("Finance Management", "Open Finance UI", () -> {
-            switchPanel(FinanceUI.createFinancePanel(null));
-        })));
+        financeBtn.addActionListener(e ->
+                switchPanel(FinanceUI.createFinancePanel(null)));
 
+        // ================= NOTIFICATIONS =================
+        notificationBtn.addActionListener(e -> {
+            dropdownPanel.setVisible(!dropdownPanel.isVisible());
 
+            if (dropdownPanel.isVisible()) {
+                loadAlerts(alertArea);
+                AlertController.markAllAsRead();
+            }
+        });
+
+        // Auto badge refresh
+        new Timer(5000, e -> {
+            int count = AlertController.getUnreadCount();
+            badgeLabel.setText(String.valueOf(count));
+        }).start();
+
+        // Close dropdown when clicking outside
+        mainPanel.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                dropdownPanel.setVisible(false);
+            }
+        });
+
+        // Logout
         logoutBtn.addActionListener(e -> {
             frame.dispose();
-            (new AuthenticatorUI()).run();
+            new AuthenticatorUI().run();
         });
     }
 
-    // Sidebar button style
+    // ================= HELPERS =================
+
     private static JButton createSidebarButton(String text) {
         JButton btn = new JButton(text);
         btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
@@ -136,7 +210,6 @@ public class OwnerDashBoardUI {
         return btn;
     }
 
-    // Switch center content
     private static void switchPanel(JPanel panel) {
         contentPanel.removeAll();
         contentPanel.add(panel, BorderLayout.CENTER);
@@ -144,7 +217,6 @@ public class OwnerDashBoardUI {
         contentPanel.repaint();
     }
 
-    // Home panel
     private static JPanel createHomePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(new Color(240, 244, 248));
@@ -156,28 +228,25 @@ public class OwnerDashBoardUI {
         return panel;
     }
 
-    // Generic page layout
-    private static JPanel createPage(String title, String buttonText, Runnable action) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(new Color(240, 244, 248));
-        panel.setBorder(new EmptyBorder(40, 40, 40, 40));
+    // ================= ALERT LOADER =================
 
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+    private static void loadAlerts(JTextArea area) {
+        try {
+            String json = AlertController.fetchUnreadAlerts();
+            var alerts = AlertController.parseAlerts(json);
 
-        JButton actionBtn = new JButton(buttonText);
-        actionBtn.setFocusPainted(false);
-        actionBtn.setBackground(new Color(0, 123, 255));
-        actionBtn.setForeground(Color.WHITE);
-        actionBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+            area.setText("");
 
-        actionBtn.addActionListener(e -> action.run());
+            for (var alert : alerts) {
+                area.append("🔔 " + alert.get("message") + "\n");
+            }
 
-        panel.add(titleLabel);
-        panel.add(Box.createRigidArea(new Dimension(0, 20)));
-        panel.add(actionBtn);
+            if (alerts.isEmpty()) {
+                area.setText("No new alerts");
+            }
 
-        return panel;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

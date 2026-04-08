@@ -117,7 +117,7 @@ public class ReportUI {
                 dialog.setVisible(true);
 
             } else {
-                UIUtils.showMessage(mainPanel, "Warning", "Select a recipe first.");
+                UIUtils.showMessage(mainPanel, "Warning", "Select an employee first.");
             }
         });
 

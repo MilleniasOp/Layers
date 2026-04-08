@@ -133,7 +133,7 @@ public class RecipeController {
 
     public static String fetchRecipeIngredients(String recipeId){
         try {
-            String path = "recipe_ingredients?recipe_id=eq." + recipeId;
+            String path = "?recipe_id=eq." + recipeId;
             HttpResponse<String> response = SupabaseClient.Tables.RECIPE_INGREDIENTS_TABLE.get(path, null);
 
             if (response.statusCode() >= 200 && response.statusCode() < 300) {

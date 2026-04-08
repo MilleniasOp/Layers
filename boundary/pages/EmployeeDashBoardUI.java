@@ -41,7 +41,7 @@ public class EmployeeDashBoardUI {
         title.setFont(new Font("Segoe UI", Font.BOLD, 20));
         title.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JButton taskBtn = createSidebarButton("Create Task");
+        JButton taskBtn = createSidebarButton("My Tasks");
 
         sidebar.add(title);
         sidebar.add(taskBtn);
