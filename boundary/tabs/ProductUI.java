@@ -36,7 +36,7 @@ public class ProductUI {
         topPanel.add(btnPanel, BorderLayout.EAST);
 
         // ===== TABLE =====
-        String[] header = {"Product Name", "Product Cost"};
+        String[] header = {"Product ID", "Product Name", "Product Description", "Product Cost", "Available"};
         JTable table = new JTable();
         table.setRowHeight(25);
 

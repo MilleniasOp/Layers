@@ -13,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /*
  Simple Supabase REST helper using Java 11+ HttpClient.
@@ -95,7 +98,11 @@ public class SupabaseClient {
         static final String TASKS = "Task";
         static final String RECIPES = "recipes";
         static final String RECIPE_INGREDIENTS = "recipe_ingredients";
-        static final String PRODUCTS = "products";
+        static final String PRODUCTS = "menu_items";
+        //new tables here
+        static final String ORDERS      = "orders";
+        static final String ORDER_ITEMS = "order_items";
+        //new table end
         public static final Table USERS_TABLE = new Table(USERS);
         public static final Table ATTENDANCE_TABLE = new Table(ATTENDANCE);
         public static final Table PAYROLL_TABLE = new Table(PAYROLL);
@@ -103,6 +110,20 @@ public class SupabaseClient {
         public static final Table RECIPES_TABLE = new Table(RECIPES);
         public static final Table RECIPE_INGREDIENTS_TABLE = new Table(RECIPE_INGREDIENTS);
         public static final Table PRODUCTS_TABLE = new Table(PRODUCTS);
+        //new tables here
+        public static final Table MENU_ITEMS_TABLE = new Table(PRODUCTS);
+        public static final Table ORDERS_TABLE = new Table(ORDERS);
+        public static final Table ORDER_ITEMS_TABLE = new Table(ORDER_ITEMS);
+        //new table end 
+    }
+
+    //new class here
+    public static String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            return value;
+        }
     }
 
     private static boolean parseBoolean(String s) {
