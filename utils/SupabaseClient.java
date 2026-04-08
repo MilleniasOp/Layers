@@ -13,6 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 /*
  Simple Supabase REST helper using Java 11+ HttpClient.
@@ -113,6 +116,15 @@ public class SupabaseClient {
         public static final Table ORDERS_TABLE = new Table(ORDERS);
         public static final Table ORDER_ITEMS_TABLE = new Table(ORDER_ITEMS);
         //new table end 
+    }
+
+    //new class here
+    public static String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            return value;
+        }
     }
 
     private static boolean parseBoolean(String s) {

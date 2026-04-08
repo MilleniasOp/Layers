@@ -3,6 +3,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import controller.Authenticator;
+import entity.User;
 import utils.UIUtils;
 
 import java.awt.*;
@@ -12,9 +13,9 @@ import java.util.function.Consumer;
 
 public class AuthenticatorUI {
 
-    private Consumer<String> authSuccessCallback;
+    private Consumer<User> authSuccessCallback;  // Change to accept User instead of String
 
-    public void setAuthSuccessCallback(Consumer<String> authSuccessCallback) {
+    public void setAuthSuccessCallback(Consumer<User> authSuccessCallback) {
         this.authSuccessCallback = authSuccessCallback;
     }
 
@@ -133,21 +134,25 @@ public class AuthenticatorUI {
             String password = new String(passwordText.getPassword());
 
             Authenticator auth = new Authenticator();
-            boolean isAuthenticated = auth.authenticate(username, password);
+            
+            try {
+                User user = auth.getUser(username, password);
+                boolean isAuthenticated = user != null;
 
-            if (isAuthenticated) {
-                UIUtils.showMessage(frame, "Success", "Login successful!");
-                String role = auth.getUserRole(username);
-
-                if (authSuccessCallback != null) {
-                    authSuccessCallback.accept(role);
+                if (isAuthenticated) {
+                    UIUtils.showMessage(frame, "Success", "Login successful!");
+                    
+                    if (authSuccessCallback != null) {
+                        authSuccessCallback.accept(user);
+                    }
+                    
+                    frame.dispose(); // Close the authenticator window
+                    
+                } else {
+                    UIUtils.showMessage(frame, "Error", "Invalid credentials.");
                 }
-
-                frame.setVisible(false);
-
-
-            } else {
-                UIUtils.showMessage(frame, "Error", "Invalid credentials.");
+            } catch (Exception ex) {
+                UIUtils.showMessage(frame, "Error", "Login error: " + ex.getMessage());
             }
         });
 
