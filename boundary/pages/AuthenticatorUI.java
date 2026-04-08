@@ -10,12 +10,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
+import entity.Customer;
+import entity.User;
+
 public class AuthenticatorUI {
 
     private Consumer<String> authSuccessCallback;
+    private Consumer<User> authSuccessCustomerCallback;
 
     public void setAuthSuccessCallback(Consumer<String> authSuccessCallback) {
         this.authSuccessCallback = authSuccessCallback;
+    }
+
+    public void setAuthSuccessCustomerCallback(Consumer<User> authSuccessCustomerCallback) {
+        this.authSuccessCustomerCallback = authSuccessCustomerCallback;
     }
 
     public void run() {
@@ -135,11 +143,17 @@ public class AuthenticatorUI {
             Authenticator auth = new Authenticator();
             boolean isAuthenticated = auth.authenticate(username, password);
 
+
             if (isAuthenticated) {
                 UIUtils.showMessage(frame, "Success", "Login successful!");
                 String role = auth.getUserRole(username);
 
-                if (authSuccessCallback != null) {
+                if ("customer".equals(role) && authSuccessCustomerCallback != null) {
+                    Customer customer = new Customer(username, password);
+                    authSuccessCustomerCallback.accept(customer);
+                }
+
+                else if(authSuccessCallback != null) {
                     authSuccessCallback.accept(role);
                 }
 

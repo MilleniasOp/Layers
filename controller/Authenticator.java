@@ -1,3 +1,4 @@
+
 package controller;
 import java.io.IOException;
 import java.net.http.HttpResponse;
@@ -101,7 +102,7 @@ public class Authenticator {
             System.err.println("Error parsing users data during authentication: " + e.getMessage());
         }
         return false; 
-    }
+    } 
 
     public String getUserRole(String username) {
         try {
