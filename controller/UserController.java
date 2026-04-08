@@ -25,7 +25,7 @@ public class UserController {
         HttpResponse<String> response = SupabaseClient.get(
                 "users?username=eq." + username
                 + "&password=eq." + password
-                + "&select=username,password,role,userId"
+                + "&select=username,password,role"
                 + "&limit=1",
                 null);
 
@@ -34,10 +34,9 @@ public class UserController {
             return null;
         }
 
-        String role   = extractValue(body, "role");
-        String userId = extractValue(body, "userId");
+        String role = extractValue(body, "role");
 
-        return new User(username, password, role, userId);
+        return new User(username, password, role);
     }
 
     private static void AddNewEmployee(Employee employee) { saveEmployee(employee); }
@@ -91,7 +90,6 @@ public class UserController {
             System.err.println("Error saving customer: " + e.getMessage());
         }
     }
-
 
     public static String fetchWorkers() {
         try {
@@ -165,7 +163,7 @@ public class UserController {
         JButton createButton = new JButton("Create");
         createButton.addActionListener(e -> {
             try {
-                Employee employee = new Employee(username.getText(), password.getText(), password.getText(), password.getText());
+                Employee employee = new Employee(username.getText(), password.getText());
                 AddNewEmployee(employee);
                 UIUtils.showMessage(dialog, "Success", "Employee created successfully!");
                 dialog.dispose();
@@ -194,7 +192,7 @@ public class UserController {
         JButton createButton = new JButton("Create");
         createButton.addActionListener(e -> {
             try {
-                Owner owner = new Owner(username.getText(), password.getText(), password.getText(), password.getText());
+                Owner owner = new Owner(username.getText(), password.getText());
                 AddNewOwner(owner);
                 UIUtils.showMessage(dialog, "Success", "Director created successfully!");
                 dialog.dispose();

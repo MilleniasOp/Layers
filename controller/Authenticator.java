@@ -22,7 +22,7 @@ public class Authenticator {
         HttpResponse<String> response = SupabaseClient.get(
                 "users?username=eq." + username
                 + "&password=eq." + password
-                + "&select=username,password,role,userId"
+                + "&select=username,password,role"
                 + "&limit=1",
                 null);
         
@@ -32,9 +32,8 @@ public class Authenticator {
         }
         
         String role = extractValue(body, "role");
-        String userId = extractValue(body, "userId");
         
-        return new User(username, password, role, userId);
+        return new User(username, password, role);
     }
     
     public String getUserRole(String username) {

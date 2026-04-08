@@ -1,16 +1,14 @@
 package entity;
+
 import java.io.IOException;
 import java.net.http.HttpResponse;
 import java.util.List;
-
 import utils.SupabaseClient;
-
 import java.util.ArrayList;
 
-
 public class Employee extends User {
-    public Employee(String username, String password, String role, String userId) {
-        super(username, password, "employee", userId);
+    public Employee(String username, String password) {
+        super(username, password, "employee");
     }
 
     public List<Task> viewTasks() {
@@ -33,13 +31,11 @@ public class Employee extends User {
 
     private void updateTaskStatus(Task task) {
         try {
-            // Create JSON body for the update
             String jsonBody = String.format(
                 "{\"status\":\"%s\"}",
                 escapeJson(task.getStatus())
             );
 
-            // PATCH to Task table with taskId filter
             String path = "Task?taskId=eq." + task.getTaskId();
             HttpResponse<String> response = SupabaseClient.patch(path, jsonBody, null);
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
@@ -54,7 +50,6 @@ public class Employee extends User {
         }
     }
 
-
     private String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\")
@@ -67,21 +62,19 @@ public class Employee extends User {
     private List<Task> getTasksFromSupabase() {
         List<Task> tasks = new ArrayList<>();
         try {
-            // GET tasks assigned to this employee using filter
             String path = "Task?assignedTo=eq." + getUsername();
             HttpResponse<String> response = SupabaseClient.get(path, null);
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 System.out.println("Tasks retrieved from Supabase successfully."); 
                 String responseBody = response.body();
-                // Assuming response is a JSON array like [{"taskId":"...", ...}, ...]
                 if (responseBody.startsWith("[") && responseBody.endsWith("]")) {
-                    String content = responseBody.substring(1, responseBody.length() - 1); // remove [ ]
+                    String content = responseBody.substring(1, responseBody.length() - 1);
                     if (!content.trim().isEmpty()) {
                         String[] taskStrings = content.split("},");
                         for (int i = 0; i < taskStrings.length; i++) {
                             String taskStr = taskStrings[i];
                             if (i < taskStrings.length - 1) {
-                                taskStr += "}"; // add back the } that was removed by split
+                                taskStr += "}";
                             }
                             Task task = parseTaskFromJson(taskStr.trim());
                             if (task != null) {
@@ -103,7 +96,6 @@ public class Employee extends User {
 
     private Task parseTaskFromJson(String json) {
         try {
-            // Simple JSON parsing for {"taskId":"...","description":"...","assignedTo":"...","status":"...","createdDate":"..."}
             String taskId = extractJsonValue(json, "taskId");
             String description = extractJsonValue(json, "description");
             String assignedTo = extractJsonValue(json, "assignedTo");
@@ -116,7 +108,6 @@ public class Employee extends User {
                 task.setDescription(description);
                 task.setAssignedTo(assignedTo);
                 task.setStatus(status);
-                // Note: createdDate is not settable, skipping for now
                 return task;
             }
         } catch (Exception e) {
@@ -138,5 +129,4 @@ public class Employee extends User {
         }
         return null;
     }
-
 }
