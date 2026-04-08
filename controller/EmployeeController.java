@@ -24,7 +24,8 @@ public class EmployeeController {
 
     //Updating the status of tasks
     public void updateTaskStatus (Task task, Employee employee, String newStatus){
-        TaskController.updateTask (task,employee, newStatus);
+        TaskController controller = new TaskController();
+        controller.updateTask (task,employee, newStatus);
     }
 
 }
