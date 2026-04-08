@@ -12,19 +12,26 @@ import java.util.function.Consumer;
 import entity.User;
 
 import entity.Customer;
+import entity.Employee;
+import entity.Owner;
 import entity.User;
 
 public class AuthenticatorUI {
 
-    private Consumer<String> authSuccessCallback;
-    private Consumer<User> authSuccessCustomerCallback;
+    private Consumer<Owner> authSuccessCallback;
+    private Consumer<Customer> authSuccessCustomerCallback;
+    private Consumer<Employee> authSuccessEmployeeCallback;
 
-    public void setAuthSuccessCallback(Consumer<User> authSuccessCallback) {
+    public void setAuthSuccessCallback(Consumer<Owner> authSuccessCallback) {
         this.authSuccessCallback = authSuccessCallback;
     }
 
-    public void setAuthSuccessCustomerCallback(Consumer<User> authSuccessCustomerCallback) {
+    public void setAuthSuccessCustomerCallback(Consumer<Customer> authSuccessCustomerCallback) {
         this.authSuccessCustomerCallback = authSuccessCustomerCallback;
+    }
+
+    public void setAuthSuccessEmployeeCallback(Consumer<Employee> authSuccessEmployeeCallback) {
+        this.authSuccessEmployeeCallback = authSuccessEmployeeCallback;
     }
 
     public void run() {
@@ -148,18 +155,20 @@ public class AuthenticatorUI {
             if (isAuthenticated) {
                 UIUtils.showMessage(frame, "Success", "Login successful!");
                 String role = auth.getUserRole(username);
-                User user = new User(username, password, role);
-                this.authUsername = username; // Store authenticated username
 
-                if (authSuccessCallback != null) {
-                    authSuccessCallback.accept(user);
+
+                if ("employee".equals(role) && authSuccessEmployeeCallback != null) {
+                    Employee employee = new Employee(username, password);
+                    authSuccessEmployeeCallback.accept(employee);
+                }
                 if ("customer".equals(role) && authSuccessCustomerCallback != null) {
                     Customer customer = new Customer(username, password);
                     authSuccessCustomerCallback.accept(customer);
                 }
 
-                else if(authSuccessCallback != null) {
-                    authSuccessCallback.accept(role);
+                if ("director".equals(role) && authSuccessCallback != null) {
+                    Owner owner = new Owner(username, password);
+                    authSuccessCallback.accept(owner);
                 }
 
                 frame.setVisible(false);
@@ -180,10 +189,6 @@ public class AuthenticatorUI {
         field.setBackground(new Color(50, 50, 50));
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
-    }
-
-    public String getAuthenticatedUsername() {
-        return authUsername;
     }
     
 }

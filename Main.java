@@ -17,23 +17,13 @@ public class Main {
         EmployeeDashBoardUI employeeDashBoardUI = new EmployeeDashBoardUI();
 
         authUI.setAuthSuccessCallback(user -> {
+            System.out.println("Owner authentication successful! Proceeding to the owner dashboard...");
+            ownerDashBoardUI.run();
+        });
 
-        authUI.setAuthSuccessCallback(role -> {
-            System.out.println("Authentication successful! Proceeding to the main application...");
-            
-
-            if ("director".equals(user.getRole())) {
-            if ("director".equals(role)) {
-                // Create Owner UI only after successful login
-                ownerDashBoardUI.run();
-            } else if ("employee".equals(user.getRole())) {
-                employeeDashBoardUI.run(user);
-            } else if ("manager".equals(user.getRole())) {
-                JOptionPane.showMessageDialog(null, "Manager UI not implemented yet");
-
-            } else {
-                JOptionPane.showMessageDialog(null, "Unknown role: " + user.getRole());
-            }
+        authUI.setAuthSuccessEmployeeCallback(user -> {
+            System.out.println("Employee authentication successful! Proceeding to the employee dashboard...");
+            employeeDashBoardUI.run(user);
         });
 
         authUI.setAuthSuccessCustomerCallback(user -> {
