@@ -88,17 +88,39 @@ public class CustomerDashboardUI extends JFrame {
     }
     
     private void logout() {
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Are you sure you want to logout?",
-                "Logout",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+    int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to logout?",
+            "Logout",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        // Close the current dashboard
+        this.dispose();
         
-        if (confirm == JOptionPane.YES_OPTION) {
-            this.dispose();
-            (new AuthenticatorUI()).run();
-        }
+        // Create a new authenticator instance
+        SwingUtilities.invokeLater(() -> {
+            AuthenticatorUI authUI = new AuthenticatorUI();
+            
+            // Set up the callbacks again
+            authUI.setAuthSuccessCustomerCallback(customer -> {
+                CustomerDashboardUI customerDashboardUI = new CustomerDashboardUI(customer);
+                customerDashboardUI.run();
+            });
+            
+            authUI.setAuthSuccessCallback(owner -> {
+                OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
+                ownerDashBoardUI.run();
+            });
+            
+            authUI.setAuthSuccessEmployeeCallback(employee -> {
+                JOptionPane.showMessageDialog(null, "Employee UI not implemented yet");
+            });
+            
+            authUI.run();
+        });
     }
+}
 
     private void loadBrowseMenu() {
         selectedOrderId = null;
