@@ -102,31 +102,7 @@ public class CustomerDashboardUI extends JFrame {
         if (confirm == JOptionPane.YES_OPTION) {
             // Close the current dashboard
             this.dispose();
-            
-            // Open a new AuthenticatorUI
-            SwingUtilities.invokeLater(() -> {
-                AuthenticatorUI authUI = new AuthenticatorUI();
-                
-                // Set up the callback for the new authenticator
-                authUI.setAuthSuccessCallback(newUser -> {
-                    String role = newUser.getRole();
-                    if ("director".equals(role)) {
-                        OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
-                        ownerDashBoardUI.run();
-                    } else if ("employee".equals(role)) {
-                        JOptionPane.showMessageDialog(null, "Employee UI not implemented yet");
-                    } else if ("manager".equals(role)) {
-                        JOptionPane.showMessageDialog(null, "Manager UI not implemented yet");
-                    } else if ("customer".equals(role)) {
-                        CustomerDashboardUI customerDashboardUI = new CustomerDashboardUI(newUser);
-                        customerDashboardUI.run();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Unknown role: " + role);
-                    }
-                });
-                
-                authUI.run();
-            });
+            (new AuthenticatorUI()).run();
         }
     }
 

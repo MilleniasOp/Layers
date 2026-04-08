@@ -12,27 +12,30 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         AuthenticatorUI authUI = new AuthenticatorUI();
+        OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
 
-        authUI.setAuthSuccessCallback(user -> {
-            System.out.println("Authentication successful! Welcome " + user.getUsername());
+
+        authUI.setAuthSuccessCallback(role -> {
+            System.out.println("Authentication successful! Proceeding to the main application...");
             
-            String role = user.getRole();
 
             if ("director".equals(role)) {
                 // Create Owner UI only after successful login
-                OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
                 ownerDashBoardUI.run();
             } else if ("employee".equals(role)) {
                 JOptionPane.showMessageDialog(null, "Employee UI not implemented yet");
             } else if ("manager".equals(role)) {
                 JOptionPane.showMessageDialog(null, "Manager UI not implemented yet");
-            } else if ("customer".equals(role)) {
-                // Create Customer UI with the actual logged-in user
-                CustomerDashboardUI customerDashboardUI = new CustomerDashboardUI(user);
-                customerDashboardUI.run();
+
             } else {
                 JOptionPane.showMessageDialog(null, "Unknown role: " + role);
             }
+        });
+
+        authUI.setAuthSuccessCustomerCallback(user -> {
+            System.out.println("Customer authentication successful! Proceeding to the customer dashboard...");
+            CustomerDashboardUI customerDashboardUI = new CustomerDashboardUI(user);
+            customerDashboardUI.run();
         });
         
         authUI.run();

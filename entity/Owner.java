@@ -1,8 +1,8 @@
 package entity;
 
 public class Owner extends User{
-    public Owner(String username, String password, String role, String userId) {
-        super(username, password, "director", userId);
+    public Owner(String username, String password) {
+        super(username, password, "director");
     }
 
     /**

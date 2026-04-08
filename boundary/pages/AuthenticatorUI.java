@@ -3,7 +3,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import controller.Authenticator;
-import entity.User;
 import utils.UIUtils;
 
 import java.awt.*;
@@ -11,12 +10,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
 
+import entity.Customer;
+import entity.User;
+
 public class AuthenticatorUI {
 
-    private Consumer<User> authSuccessCallback;  // Change to accept User instead of String
+    private Consumer<String> authSuccessCallback;
+    private Consumer<User> authSuccessCustomerCallback;
 
-    public void setAuthSuccessCallback(Consumer<User> authSuccessCallback) {
+    public void setAuthSuccessCallback(Consumer<String> authSuccessCallback) {
         this.authSuccessCallback = authSuccessCallback;
+    }
+
+    public void setAuthSuccessCustomerCallback(Consumer<User> authSuccessCustomerCallback) {
+        this.authSuccessCustomerCallback = authSuccessCustomerCallback;
     }
 
     public void run() {
@@ -134,25 +141,27 @@ public class AuthenticatorUI {
             String password = new String(passwordText.getPassword());
 
             Authenticator auth = new Authenticator();
-            
-            try {
-                User user = auth.getUser(username, password);
-                boolean isAuthenticated = user != null;
+            boolean isAuthenticated = auth.authenticate(username, password);
 
-                if (isAuthenticated) {
-                    UIUtils.showMessage(frame, "Success", "Login successful!");
-                    
-                    if (authSuccessCallback != null) {
-                        authSuccessCallback.accept(user);
-                    }
-                    
-                    frame.dispose(); // Close the authenticator window
-                    
-                } else {
-                    UIUtils.showMessage(frame, "Error", "Invalid credentials.");
+
+            if (isAuthenticated) {
+                UIUtils.showMessage(frame, "Success", "Login successful!");
+                String role = auth.getUserRole(username);
+
+                if ("customer".equals(role) && authSuccessCustomerCallback != null) {
+                    Customer customer = new Customer(username, password);
+                    authSuccessCustomerCallback.accept(customer);
                 }
-            } catch (Exception ex) {
-                UIUtils.showMessage(frame, "Error", "Login error: " + ex.getMessage());
+
+                else if(authSuccessCallback != null) {
+                    authSuccessCallback.accept(role);
+                }
+
+                frame.setVisible(false);
+
+
+            } else {
+                UIUtils.showMessage(frame, "Error", "Invalid credentials.");
             }
         });
 

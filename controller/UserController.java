@@ -19,27 +19,6 @@ import java.awt.*;
 
 public class UserController {
 
-    public static User login(String username, String password)
-            throws IOException, InterruptedException {
-
-        HttpResponse<String> response = SupabaseClient.get(
-                "users?username=eq." + username
-                + "&password=eq." + password
-                + "&select=username,password,role,userId"
-                + "&limit=1",
-                null);
-
-        String body = response.body();
-        if (body == null || body.equals("[]") || body.isBlank()) {
-            return null;
-        }
-
-        String role   = extractValue(body, "role");
-        String userId = extractValue(body, "userId");
-
-        return new User(username, password, role, userId);
-    }
-
     private static void AddNewEmployee(Employee employee) { saveEmployee(employee); }
     private static void AddNewCustomer(Customer customer) { saveCustomer(customer); }
     private static void AddNewOwner(Owner owner)          { saveOwner(owner); }
@@ -164,8 +143,11 @@ public class UserController {
         panel.add(new JLabel("Employee Password")); panel.add(password);
         JButton createButton = new JButton("Create");
         createButton.addActionListener(e -> {
+            String name = username.getText();
+            String pass = password.getText();
+            
             try {
-                Employee employee = new Employee(username.getText(), password.getText(), password.getText(), password.getText());
+                Employee employee = new Employee(name, pass);
                 AddNewEmployee(employee);
                 UIUtils.showMessage(dialog, "Success", "Employee created successfully!");
                 dialog.dispose();
@@ -193,8 +175,11 @@ public class UserController {
         panel.add(new JLabel("Director Password")); panel.add(password);
         JButton createButton = new JButton("Create");
         createButton.addActionListener(e -> {
+            String name = username.getText();
+            String pass = password.getText();
+
             try {
-                Owner owner = new Owner(username.getText(), password.getText(), password.getText(), password.getText());
+                Owner owner = new Owner(name,pass);
                 AddNewOwner(owner);
                 UIUtils.showMessage(dialog, "Success", "Director created successfully!");
                 dialog.dispose();
