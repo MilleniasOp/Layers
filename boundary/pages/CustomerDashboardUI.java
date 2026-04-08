@@ -1,9 +1,7 @@
 package boundary.pages;
 
 import controller.BrowseMenuController;
-import controller.CancelOrderController;
-import controller.NewOrderController;
-import controller.OrderDetailsController;
+import controller.OrderController;
 import entity.MenuItem;
 import entity.Order;
 import entity.User;
@@ -18,9 +16,7 @@ public class CustomerDashboardUI extends JFrame {
 
     private final User                    user;
     private final BrowseMenuController    browseCtrl = new BrowseMenuController();
-    private final NewOrderController      placeCtrl  = new NewOrderController();
-    private final CancelOrderController   cancelCtrl = new CancelOrderController();
-    private final OrderDetailsController  viewCtrl   = new OrderDetailsController();
+    private final OrderController         orderCtrl  = new OrderController();
 
     private final DefaultTableModel tableModel = new DefaultTableModel() {
         @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -37,7 +33,7 @@ public class CustomerDashboardUI extends JFrame {
 
     private void buildUI() {
         setTitle("Customer Dashboard — " + user.getUsername());
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Changed from EXIT_ON_CLOSE to DISPOSE_ON_CLOSE
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
@@ -86,13 +82,12 @@ public class CustomerDashboardUI extends JFrame {
         btnPlace.addActionListener(e  -> openPlaceOrder());
         btnCancel.addActionListener(e -> openCancelOrder());
         btnView.addActionListener(e   -> viewSelectedOrderDetails());
-        btnLogout.addActionListener(e -> logout()); // Updated to call logout method
+        btnLogout.addActionListener(e -> logout());
 
         setVisible(true);
     }
     
     private void logout() {
-        // Confirm logout
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to logout?",
                 "Logout",
@@ -100,7 +95,6 @@ public class CustomerDashboardUI extends JFrame {
                 JOptionPane.QUESTION_MESSAGE);
         
         if (confirm == JOptionPane.YES_OPTION) {
-            // Close the current dashboard
             this.dispose();
             (new AuthenticatorUI()).run();
         }
@@ -129,7 +123,7 @@ public class CustomerDashboardUI extends JFrame {
 
     private void openPlaceOrder() {
         runAsync("Fetching available items…", () -> {
-            List<MenuItem> items = placeCtrl.getAvailableItems();
+            List<MenuItem> items = orderCtrl.getAvailableItems();
             SwingUtilities.invokeLater(() -> {
                 if (items.isEmpty()) {
                     JOptionPane.showMessageDialog(this,
@@ -138,13 +132,11 @@ public class CustomerDashboardUI extends JFrame {
                     return;
                 }
 
-                // Create a panel with quantity spinners for each item
                 JPanel panel = new JPanel(new GridBagLayout());
                 GridBagConstraints gbc = new GridBagConstraints();
                 gbc.fill = GridBagConstraints.HORIZONTAL;
                 gbc.insets = new Insets(5, 5, 5, 5);
                 
-                // Header row
                 gbc.gridx = 0;
                 gbc.gridy = 0;
                 panel.add(new JLabel("Select"), gbc);
@@ -155,7 +147,6 @@ public class CustomerDashboardUI extends JFrame {
                 gbc.gridx = 3;
                 panel.add(new JLabel("Quantity"), gbc);
                 
-                // Store checkboxes and spinners
                 List<JCheckBox> checkBoxes = new java.util.ArrayList<>();
                 List<JSpinner> spinners = new java.util.ArrayList<>();
                 
@@ -180,15 +171,14 @@ public class CustomerDashboardUI extends JFrame {
                     gbc.gridx = 3;
                     SpinnerNumberModel spinnerModel = new SpinnerNumberModel(1, 1, 10, 1);
                     JSpinner spinner = new JSpinner(spinnerModel);
-                    spinner.setEnabled(false); // Disabled until checkbox is selected
+                    spinner.setEnabled(false);
                     spinners.add(spinner);
                     panel.add(spinner, gbc);
                     
-                    // Enable spinner when checkbox is selected
                     checkBox.addActionListener(e -> {
                         spinner.setEnabled(checkBox.isSelected());
                         if (!checkBox.isSelected()) {
-                            spinner.setValue(1); // Reset to 1 when unchecked
+                            spinner.setValue(1);
                         }
                     });
                     
@@ -203,13 +193,11 @@ public class CustomerDashboardUI extends JFrame {
                         JOptionPane.OK_CANCEL_OPTION);
                 if (result != JOptionPane.OK_OPTION) return;
                 
-                // Build list with quantities (duplicate item IDs based on quantity)
                 List<String> selectedIds = new java.util.ArrayList<>();
                 for (int i = 0; i < checkBoxes.size(); i++) {
                     if (checkBoxes.get(i).isSelected()) {
                         int quantity = (Integer) spinners.get(i).getValue();
                         MenuItem item = items.get(i);
-                        // Add the item ID multiple times based on quantity
                         for (int q = 0; q < quantity; q++) {
                             selectedIds.add(item.getItemId());
                         }
@@ -222,10 +210,9 @@ public class CustomerDashboardUI extends JFrame {
                 }
                 
                 runAsync("Placing order…", () -> {
-                    Order order = placeCtrl.buildOrder(user.getUsername(), selectedIds);
+                    Order order = orderCtrl.buildOrder(user.getUsername(), selectedIds);
                     StringBuilder sb = new StringBuilder("Order Summary:\n\n");
                     
-                    // Group by item to show quantities nicely
                     java.util.Map<String, Integer> quantityMap = new java.util.HashMap<>();
                     java.util.Map<String, MenuItem> itemMap = new java.util.HashMap<>();
                     
@@ -250,7 +237,7 @@ public class CustomerDashboardUI extends JFrame {
                             sb.toString(), "Confirm Order?", JOptionPane.YES_NO_OPTION);
                     if (confirm != JOptionPane.YES_OPTION) return;
                     
-                    placeCtrl.confirmOrder(order);
+                    orderCtrl.confirmOrder(order);
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(this,
                                 "✔ Order placed!\nOrder ID: " + order.getOrderId()
@@ -265,7 +252,7 @@ public class CustomerDashboardUI extends JFrame {
 
     private void openCancelOrder() {
         runAsync("Fetching your cancellable orders…", () -> {
-            List<Order> orders = cancelCtrl.fetchActiveOrdersForUser(user.getUsername());
+            List<Order> orders = orderCtrl.fetchActiveOrdersForUser(user.getUsername());
             SwingUtilities.invokeLater(() -> {
                 if (orders.isEmpty()) {
                     JOptionPane.showMessageDialog(this,
@@ -289,7 +276,7 @@ public class CustomerDashboardUI extends JFrame {
                 String orderId = chosen.split("\\s*\\|")[0].trim();
 
                 runAsync("Cancelling…", () -> {
-                    String msg = cancelCtrl.cancelOrder(orderId, user.getUsername());
+                    String msg = orderCtrl.cancelOrder(orderId, user.getUsername());
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(this, msg,
                                 msg.startsWith("SUCCESS") ? "Success" : "Notice",
@@ -306,7 +293,7 @@ public class CustomerDashboardUI extends JFrame {
     private void loadOrderHistory() {
         selectedOrderId = null;
         runAsync("Loading your orders…", () -> {
-            List<Order> orders = viewCtrl.getOrderHistory(user.getUsername());
+            List<Order> orders = orderCtrl.getOrderHistory(user.getUsername());
             SwingUtilities.invokeLater(() -> {
                 tableModel.setRowCount(0);
                 tableModel.setColumnIdentifiers(
@@ -338,7 +325,7 @@ public class CustomerDashboardUI extends JFrame {
 
         String orderId = selectedOrderId;
         runAsync("Loading order details…", () -> {
-            Order order = viewCtrl.getOrderDetails(orderId, user.getUsername());
+            Order order = orderCtrl.getOrderDetails(orderId, user.getUsername());
             SwingUtilities.invokeLater(() -> {
                 if (order == null) {
                     JOptionPane.showMessageDialog(this,
@@ -347,7 +334,6 @@ public class CustomerDashboardUI extends JFrame {
                     return;
                 }
 
-                // Create table model with item name, quantity, and subtotal
                 DefaultTableModel detailModel = new DefaultTableModel() {
                     @Override public boolean isCellEditable(int r, int c) { return false; }
                 };

@@ -71,7 +71,6 @@ public class UserController {
         }
     }
 
-
     public static String fetchWorkers() {
         try {
             HttpResponse<String> response = SupabaseClient.get("users?role=neq.customer", null);

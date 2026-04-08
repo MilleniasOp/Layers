@@ -6,14 +6,165 @@ import utils.SupabaseClient;
 
 import java.io.IOException;
 import java.net.http.HttpResponse;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-public class OrderDetailsController {
- 
+public class OrderController {
+
+    private final BrowseMenuController browseMenuController;
+
+    public OrderController() {
+        this.browseMenuController = new BrowseMenuController();
+    }
+
+    // ORDER PLACEMENT
+    
+    public List<MenuItem> getAvailableItems() throws IOException, InterruptedException {
+        return browseMenuController.retrieveAvailableItems();
+    }
+
+    public Order buildOrder(String username, List<String> selectedItemIds)
+            throws IOException, InterruptedException {
+
+        List<MenuItem> allItems = browseMenuController.retrieveMenuItems();
+        Order order = new Order(UUID.randomUUID().toString(), username);
+
+        // Count occurrences of each item ID
+        java.util.Map<String, Integer> quantityMap = new java.util.HashMap<>();
+        for (String id : selectedItemIds) {
+            quantityMap.put(id, quantityMap.getOrDefault(id, 0) + 1);
+        }
+
+        // Add items with quantities
+        for (java.util.Map.Entry<String, Integer> entry : quantityMap.entrySet()) {
+            String itemId = entry.getKey();
+            int quantity = entry.getValue();
+            
+            allItems.stream()
+                    .filter(i -> i.getItemId().equals(itemId) && i.isAvailable())
+                    .findFirst()
+                    .ifPresent(item -> order.addItem(item, quantity));
+        }
+        return order;
+    }
+
+    public Order confirmOrder(Order order) throws IOException, InterruptedException {
+        if (order.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Cannot place an order with no items.");
+        }
+
+        order.setStatus(Order.Status.PENDING);
+
+        // 1. Save the order
+        String orderJson = String.format(
+                "{\"order_id\":\"%s\",\"username\":\"%s\",\"status\":\"PENDING\",\"total_price\":%.2f}",
+                order.getOrderId(), order.getUsername(), order.getTotalPrice());
+
+        System.out.println("Saving order: " + orderJson);
+        
+        var orderResponse = SupabaseClient.Tables.ORDERS_TABLE.post(
+                orderJson,
+                Map.of("Prefer", "return=representation"));
+        
+        System.out.println("Order save response status: " + orderResponse.statusCode());
+        System.out.println("Order save response body: " + orderResponse.body());
+
+        // 2. Save each order item with quantity
+        for (Order.OrderItem orderItem : order.getItems()) {
+            MenuItem item = orderItem.getMenuItem();
+            int quantity = orderItem.getQuantity();
+            
+            String itemJson = String.format(
+                    "{\"order_id\":\"%s\",\"item_id\":\"%s\",\"quantity\":%d}",
+                    order.getOrderId(), 
+                    item.getItemId(), 
+                    quantity);
+
+            System.out.println("Saving order item: " + itemJson);
+            
+            var itemResponse = SupabaseClient.Tables.ORDER_ITEMS_TABLE.post(
+                    itemJson,
+                    Map.of("Prefer", "return=representation"));
+            
+            System.out.println("Order item save response status: " + itemResponse.statusCode());
+            System.out.println("Order item save response body: " + itemResponse.body());
+        }
+
+        return order;
+    }
+
+    // ORDER CANCELLATION
+
+    public List<Order> fetchActiveOrdersForUser(String username)
+            throws IOException, InterruptedException {
+
+        String encodedUsername = SupabaseClient.encodeValue(username);
+        HttpResponse<String> response =
+                SupabaseClient.Tables.ORDERS_TABLE.get(
+                        "?username=eq." + encodedUsername
+                        + "&status=eq.PENDING"
+                        + "&select=*"
+                        + "&order=placed_at.desc",
+                        null);
+
+        return parseOrders(response.body());
+    }
+
+    public String cancelOrder(String orderId, String username)
+            throws IOException, InterruptedException {
+
+        HttpResponse<String> response =
+                SupabaseClient.Tables.ORDERS_TABLE.get(
+                        "?order_id=eq." + orderId + "&select=*&limit=1", null);
+
+        String body = response.body();
+        if (body == null || body.equals("[]") || body.isBlank()) {
+            return "ERROR: Order not found.";
+        }
+
+        String ownerUsername = BrowseMenuController.extractString(body, "username");
+        String status        = BrowseMenuController.extractString(body, "status");
+        String placedAt      = BrowseMenuController.extractString(body, "placed_at");
+
+        if (!ownerUsername.equals(username)) {
+            return "ERROR: You can only cancel your own orders.";
+        }
+        if ("CONFIRMED".equals(status)) {
+            return "ERROR: Confirmed orders cannot be cancelled.";
+        }
+        if ("CANCELLED".equals(status)) {
+            return "ERROR: This order is already cancelled.";
+        }
+        if (!isWithinWindow(placedAt)) {
+            return "Order can no longer be cancelled (5-minute window has passed).";
+        }
+
+        SupabaseClient.Tables.ORDERS_TABLE.patch(
+                "?order_id=eq." + orderId,
+                "{\"status\":\"CANCELLED\"}",
+                Map.of("Prefer", "return=minimal"));
+
+        return "SUCCESS: Order " + orderId + " has been cancelled.";
+    }
+
+    private boolean isWithinWindow(String placedAtStr) {
+        try {
+            LocalDateTime placed = OffsetDateTime.parse(placedAtStr).toLocalDateTime();
+            return LocalDateTime.now().isBefore(placed.plusMinutes(5));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // ORDER DETAILS 
+
     public List<Order> getOrderHistory(String username)
             throws IOException, InterruptedException {
- 
+
         String encodedUsername = SupabaseClient.encodeValue(username);
         HttpResponse<String> response =
                 SupabaseClient.Tables.ORDERS_TABLE.get(
@@ -21,22 +172,22 @@ public class OrderDetailsController {
                         + "&select=*"
                         + "&order=placed_at.desc",
                         null);
- 
+
         return parseOrders(response.body());
     }
- 
+
     public Order getOrderDetails(String orderId, String username)
             throws IOException, InterruptedException {
- 
+
         // First, get the order details
         HttpResponse<String> response =
                 SupabaseClient.Tables.ORDERS_TABLE.get(
                         "?order_id=eq." + orderId + "&select=*&limit=1",
                         null);
- 
+
         String body = response.body();
         if (body == null || body.equals("[]") || body.isBlank()) return null;
- 
+
         // Remove outer array brackets
         String orderObj = body.trim();
         if (orderObj.startsWith("[") && orderObj.endsWith("]")) {
@@ -44,21 +195,21 @@ public class OrderDetailsController {
         }
         
         if (orderObj.isBlank()) return null;
- 
+
         // Check if the order belongs to this user
         if (!orderObj.contains("\"username\":\"" + username + "\"")) return null;
- 
+
         String status = BrowseMenuController.extractString(orderObj, "status");
         double total = BrowseMenuController.extractDouble(orderObj, "total_price");
         String placedAt = BrowseMenuController.extractString(orderObj, "placed_at");
- 
+
         Order order = new Order(orderId, username);
         try { 
             order.setStatus(Order.Status.valueOf(status)); 
         } catch (IllegalArgumentException ignored) {}
         order.setTotalPrice(total);
         order.setPlacedAt(placedAt);
- 
+
         // Now get the order items with quantities
         HttpResponse<String> itemsResponse =
                 SupabaseClient.Tables.ORDER_ITEMS_TABLE.get(
@@ -66,7 +217,6 @@ public class OrderDetailsController {
                         null);
         
         String itemsBody = itemsResponse.body();
-        System.out.println("Order items response: " + itemsBody); // Debug log
         
         if (itemsBody != null && !itemsBody.equals("[]") && !itemsBody.isBlank()) {
             // Parse the order items
@@ -86,17 +236,13 @@ public class OrderDetailsController {
                     String itemId = BrowseMenuController.extractString(itemObj, "item_id");
                     int quantity = (int) BrowseMenuController.extractDouble(itemObj, "quantity");
                     
-                    System.out.println("Processing item - ID: " + itemId + ", Quantity: " + quantity); // Debug log
-                    
                     if (quantity > 0) {
                         // Get full menu item details
                         MenuItem fullItem = getMenuItemDetails(itemId);
                         if (fullItem != null) {
-                            System.out.println("Found item: " + fullItem.getName() + " - $" + fullItem.getPrice()); // Debug log
                             order.addItem(fullItem, quantity);
                         } else {
-                            System.err.println("Failed to find menu item details for ID: " + itemId);
-                            // Create a fallback menu item with a meaningful name
+                            // Fallback: create a basic menu item if details can't be fetched
                             MenuItem fallbackItem = new MenuItem(
                                 itemId, 
                                 "Unknown Item (ID: " + itemId + ")", 
@@ -109,15 +255,11 @@ public class OrderDetailsController {
                     }
                 }
             }
-        } else {
-            System.out.println("No order items found for order: " + orderId);
         }
-        
-        System.out.println("Total items added to order: " + order.getItems().size()); // Debug log
-        
+
         return order;
     }
-    
+
     private MenuItem getMenuItemDetails(String itemId) 
             throws IOException, InterruptedException {
         HttpResponse<String> response =
@@ -126,7 +268,6 @@ public class OrderDetailsController {
                         null);
         
         String body = response.body();
-        System.out.println("Menu item response for " + itemId + ": " + body); // Debug log
         
         if (body == null || body.equals("[]") || body.isBlank()) return null;
         
@@ -142,15 +283,13 @@ public class OrderDetailsController {
         double price = BrowseMenuController.extractDouble(itemObj, "price");
         boolean available = BrowseMenuController.extractBoolean(itemObj, "available");
         
-        System.out.println("Parsed menu item - Name: " + name + ", Price: " + price); // Debug log
-        
         return new MenuItem(itemId, name, description, price, available);
     }
- 
+
     private List<Order> parseOrders(String json) {
         List<Order> orders = new ArrayList<>();
         if (json == null || json.equals("[]") || json.isBlank()) return orders;
- 
+
         String trimmed = json.trim();
         if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
             trimmed = trimmed.substring(1, trimmed.length() - 1);
@@ -168,7 +307,7 @@ public class OrderDetailsController {
             String status = BrowseMenuController.extractString(obj, "status");
             double total = BrowseMenuController.extractDouble(obj, "total_price");
             String placedAt = BrowseMenuController.extractString(obj, "placed_at");
- 
+
             Order o = new Order(orderId, username);
             try { 
                 o.setStatus(Order.Status.valueOf(status)); 
