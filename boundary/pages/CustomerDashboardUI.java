@@ -2,7 +2,7 @@ package boundary.pages;
 
 import controller.BrowseMenuController;
 import controller.OrderController;
-import entity.MenuItem;
+import entity.Product;
 import entity.Order;
 import entity.User;
 
@@ -103,17 +103,17 @@ public class CustomerDashboardUI extends JFrame {
     private void loadBrowseMenu() {
         selectedOrderId = null;
         runAsync("Loading menu…", () -> {
-            List<MenuItem> items = browseCtrl.retrieveMenuItems();
+            List<Product> items = browseCtrl.retrieveMenuItems();
             SwingUtilities.invokeLater(() -> {
                 tableModel.setRowCount(0);
                 tableModel.setColumnIdentifiers(
                         new String[]{"ID", "Name", "Description", "Price", "Available"});
                 if (items.isEmpty()) { status("No menu items available at the moment."); return; }
-                for (MenuItem m : items) {
+                for (Product p : items) {
                     tableModel.addRow(new Object[]{
-                            m.getItemId(), m.getName(), m.getDescription(),
-                            String.format("$%.2f", m.getPrice()),
-                            m.isAvailable() ? "✔ Yes" : "✘ No"
+                            p.getItemId(), p.getName(), p.getDescription(),
+                            String.format("$%.2f", p.getPrice()),
+                            p.isAvailable() ? "✔ Yes" : "✘ No"
                     });
                 }
                 status("Menu loaded — " + items.size() + " items.");
@@ -123,7 +123,7 @@ public class CustomerDashboardUI extends JFrame {
 
     private void openPlaceOrder() {
         runAsync("Fetching available items…", () -> {
-            List<MenuItem> items = orderCtrl.getAvailableItems();
+            List<Product> items = orderCtrl.getAvailableItems();
             SwingUtilities.invokeLater(() -> {
                 if (items.isEmpty()) {
                     JOptionPane.showMessageDialog(this,
@@ -151,7 +151,7 @@ public class CustomerDashboardUI extends JFrame {
                 List<JSpinner> spinners = new java.util.ArrayList<>();
                 
                 int row = 1;
-                for (MenuItem item : items) {
+                for (Product item : items) {
                     // Checkbox
                     gbc.gridx = 0;
                     gbc.gridy = row;
@@ -197,7 +197,7 @@ public class CustomerDashboardUI extends JFrame {
                 for (int i = 0; i < checkBoxes.size(); i++) {
                     if (checkBoxes.get(i).isSelected()) {
                         int quantity = (Integer) spinners.get(i).getValue();
-                        MenuItem item = items.get(i);
+                        Product item = items.get(i);
                         for (int q = 0; q < quantity; q++) {
                             selectedIds.add(item.getItemId());
                         }
@@ -214,17 +214,17 @@ public class CustomerDashboardUI extends JFrame {
                     StringBuilder sb = new StringBuilder("Order Summary:\n\n");
                     
                     java.util.Map<String, Integer> quantityMap = new java.util.HashMap<>();
-                    java.util.Map<String, MenuItem> itemMap = new java.util.HashMap<>();
+                    java.util.Map<String, Product> itemMap = new java.util.HashMap<>();
                     
                     for (Order.OrderItem orderItem : order.getItems()) {
-                        MenuItem item = orderItem.getMenuItem();
+                        Product item = orderItem.getMenuItem();
                         int quantity = orderItem.getQuantity();
                         quantityMap.put(item.getName(), quantity);
                         itemMap.put(item.getName(), item);
                     }
                     
                     for (java.util.Map.Entry<String, Integer> entry : quantityMap.entrySet()) {
-                        MenuItem item = itemMap.get(entry.getKey());
+                        Product item = itemMap.get(entry.getKey());
                         int quantity = entry.getValue();
                         sb.append("  • ").append(item.getName())
                           .append(" x").append(quantity)
@@ -340,7 +340,7 @@ public class CustomerDashboardUI extends JFrame {
                 detailModel.setColumnIdentifiers(new String[]{"Item", "Quantity", "Price", "Subtotal"});
 
                 for (Order.OrderItem orderItem : order.getItems()) {
-                    MenuItem item = orderItem.getMenuItem();
+                    Product item = orderItem.getMenuItem();
                     int quantity = orderItem.getQuantity();
                     double price = item.getPrice();
                     double subtotal = price * quantity;

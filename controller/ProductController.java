@@ -23,9 +23,12 @@ public class ProductController {
         try {
             // Create JSON body for the insert
             String jsonBody = String.format(
-                "{\"name\":\"%s\",\"cost\":\"%s\"}",
+                "{\"item_id\":\"%s\",\"name\":\"%s\",\"description\":\"%s\",\"price\":\"%s\",\"available\":\"%s\"}",
+                product.getItemId(),
                 product.getName(),
-                product.getCost()
+                product.getDescription(),
+                String.valueOf(product.getPrice()),
+                String.valueOf(product.isAvailable())
             );
 
             // POST to User table
@@ -45,50 +48,17 @@ public class ProductController {
     // ================= PRODUCT PARSER =================
     public static List<String[]> parseProductsJson(String jsonResponse) {
         List<String[]> products = new ArrayList<>();
+        if (jsonResponse == null || jsonResponse.equals("[]") || jsonResponse.isBlank()) return products;
 
-        try {
-            String content = jsonResponse.substring(1, jsonResponse.length() - 1);
-
-            List<String> objects = new ArrayList<>();
-            int braceCount = 0, start = -1;
-
-            for (int i = 0; i < content.length(); i++) {
-                char c = content.charAt(i);
-
-                if (c == '{') {
-                    if (braceCount == 0) start = i;
-                    braceCount++;
-                } else if (c == '}') {
-                    braceCount--;
-                    if (braceCount == 0) {
-                        objects.add(content.substring(start, i + 1));
-                    }
-                }
-            }
-
-            for (String obj : objects) {
-                String name = "", cost = "";
-
-                String[] pairs = obj.substring(1, obj.length() - 1).split(",");
-
-                for (String pair : pairs) {
-                    pair = pair.trim();
-
-                    if (pair.contains("\"name\"")) {
-                        name = pair.split(":", 2)[1].replaceAll("^\"|\"$", "").trim();
-                    } else if (pair.contains("\"cost\"")) {
-                        cost = pair.split(":")[1].replace("\"", "").trim();
-                    }                    
-
-                }
-
-                products.add(new String[]{name, cost});
-            }
-
-        } catch (Exception e) {
-            products.add(new String[]{"Parse Error", ""});
+        jsonResponse = jsonResponse.trim().substring(1, jsonResponse.length() - 1); 
+        for (String obj : jsonResponse.split("\\},\\s*\\{")) {
+            String itemId      = BrowseMenuController.extractString(obj, "item_id");
+            String name        = BrowseMenuController.extractString(obj, "name");
+            String description = BrowseMenuController.extractString(obj, "description");
+            String price       = String.valueOf(BrowseMenuController.extractDouble(obj, "price"));
+            String available   = String.valueOf(BrowseMenuController.extractBoolean(obj, "available"));
+            products.add(new String[]{itemId, name, description, price, available});
         }
-
         return products;
     }
 
@@ -107,37 +77,72 @@ public class ProductController {
     }
 
     //================== Add Product Dialog ==================
-    public static void showAddProductDialog(JFrame parentFrame){
+    public static void showAddProductDialog(JFrame parentFrame) {
 
         JDialog dialog = new JDialog(parentFrame, "Add New Product", true);
-        dialog.setSize(300, 250);
-        dialog.setLayout(new BorderLayout());
+        dialog.setSize(400, 350);
+        dialog.setLayout(new BorderLayout(10, 10));
 
-        JPanel panel = new JPanel(new GridLayout(2,2, 10, 10));
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        formPanel.setBorder(new EmptyBorder(20, 20, 10, 20));
 
-        JTextField product_name =  new JTextField(10);
-        JTextField product_cost = new JTextField(10);
+        JTextField itemIdField = new JTextField();
+        JTextField nameField = new JTextField();
+        JTextField descriptionField = new JTextField();
+        JTextField costField = new JTextField();
 
-        panel.add(new JLabel("Product Name"));
-        panel.add(product_name);
-        panel.add(new JLabel("Product Cost"));
-        panel.add(product_cost);
+        // Better UX than typing true/false
+        JCheckBox availableCheck = new JCheckBox("Available");
 
+        formPanel.add(new JLabel("Item ID:"));
+        formPanel.add(itemIdField);
+
+        formPanel.add(new JLabel("Product Name:"));
+        formPanel.add(nameField);
+
+        formPanel.add(new JLabel("Description:"));
+        formPanel.add(descriptionField);
+
+        formPanel.add(new JLabel("Cost:"));
+        formPanel.add(costField);
+
+        formPanel.add(new JLabel("")); // empty space
+        formPanel.add(availableCheck);
+
+        // Buttons
         JButton createButton = new JButton("Create");
+        JButton cancelButton = new JButton("Cancel");
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(createButton);
+
+        // Actions
+        cancelButton.addActionListener(e -> dialog.dispose());
+
         createButton.addActionListener(e -> {
-            String name = product_name.getText();
+            String itemId = itemIdField.getText().trim();
+            String name = nameField.getText().trim();
+            String description = descriptionField.getText().trim();
+            boolean available = availableCheck.isSelected();
 
             float cost;
-            try{
-                cost = Float.parseFloat(product_cost.getText());
-            } catch (NumberFormatException ex){
+            try {
+                cost = Float.parseFloat(costField.getText().trim());
+            } catch (NumberFormatException ex) {
                 UIUtils.showMessage(dialog, "Error", "Please enter a valid number for cost");
                 return;
             }
 
-            try{
-                Product p = new Product(name,cost);
+            if (itemId.isEmpty() || name.isEmpty()) {
+                UIUtils.showMessage(dialog, "Error", "Item ID and Name are required");
+                return;
+            }
+
+            try {
+                Product p = new Product(itemId, name, description, cost, available);
                 AddNewProduct(p);
                 UIUtils.showMessage(dialog, "Success", "Product created successfully!");
                 dialog.dispose();
@@ -146,13 +151,11 @@ public class ProductController {
             }
         });
 
-        JPanel btnPanel = new JPanel();
-        btnPanel.add(createButton);
-
-        dialog.add(panel, BorderLayout.CENTER);
-        dialog.add(btnPanel, BorderLayout.SOUTH);
+        dialog.add(formPanel, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.setLocationRelativeTo(parentFrame);
+        dialog.setResizable(false);
         dialog.setVisible(true);
     }
 }

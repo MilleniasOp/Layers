@@ -98,9 +98,8 @@ public class SupabaseClient {
         static final String TASKS = "Task";
         static final String RECIPES = "recipes";
         static final String RECIPE_INGREDIENTS = "recipe_ingredients";
-        static final String PRODUCTS = "products";
+        static final String PRODUCTS = "menu_items";
         //new tables here
-        static final String MENU_ITEMS  = "menu_items";
         static final String ORDERS      = "orders";
         static final String ORDER_ITEMS = "order_items";
         //new table end
@@ -112,7 +111,7 @@ public class SupabaseClient {
         public static final Table RECIPE_INGREDIENTS_TABLE = new Table(RECIPE_INGREDIENTS);
         public static final Table PRODUCTS_TABLE = new Table(PRODUCTS);
         //new tables here
-        public static final Table MENU_ITEMS_TABLE = new Table(MENU_ITEMS);
+        public static final Table MENU_ITEMS_TABLE = new Table(PRODUCTS);
         public static final Table ORDERS_TABLE = new Table(ORDERS);
         public static final Table ORDER_ITEMS_TABLE = new Table(ORDER_ITEMS);
         //new table end 

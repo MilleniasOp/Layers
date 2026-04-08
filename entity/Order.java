@@ -11,15 +11,15 @@ public class Order {
     public enum Status {PENDING, CONFIRMED, CANCELLED}
     
     public static class OrderItem {
-        private final MenuItem menuItem;
+        private final Product menuItem;
         private int quantity;
         
-        public OrderItem(MenuItem menuItem, int quantity) {
+        public OrderItem(Product menuItem, int quantity) {
             this.menuItem = menuItem;
             this.quantity = quantity;
         }
         
-        public MenuItem getMenuItem() { return menuItem; }
+        public Product getMenuItem() { return menuItem; }
         public int getQuantity() { return quantity; }
         public void setQuantity(int quantity) { this.quantity = quantity; }
         public double getSubtotal() { return menuItem.getPrice() * quantity; }
@@ -41,7 +41,7 @@ public class Order {
         this.placedAt   = "";
     }
     
-    public void addItem(MenuItem item, int quantity) {
+    public void addItem(Product item, int quantity) {
         for (OrderItem orderItem : items) {
             if (orderItem.getMenuItem().getItemId().equals(item.getItemId())) {
                 orderItem.setQuantity(orderItem.getQuantity() + quantity);
@@ -53,7 +53,7 @@ public class Order {
         totalPrice += item.getPrice() * quantity;
     }
     
-    public void addItem(MenuItem item) {
+    public void addItem(Product item) {
         addItem(item, 1);
     }
  

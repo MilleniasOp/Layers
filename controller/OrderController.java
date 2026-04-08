@@ -1,6 +1,6 @@
 package controller;
 
-import entity.MenuItem;
+import entity.Product;
 import entity.Order;
 import utils.SupabaseClient;
 
@@ -23,14 +23,14 @@ public class OrderController {
 
     // ORDER PLACEMENT
     
-    public List<MenuItem> getAvailableItems() throws IOException, InterruptedException {
+    public List<Product> getAvailableItems() throws IOException, InterruptedException {
         return browseMenuController.retrieveAvailableItems();
     }
 
     public Order buildOrder(String username, List<String> selectedItemIds)
             throws IOException, InterruptedException {
 
-        List<MenuItem> allItems = browseMenuController.retrieveMenuItems();
+        List<Product> allItems = browseMenuController.retrieveMenuItems();
         Order order = new Order(UUID.randomUUID().toString(), username);
 
         // Count occurrences of each item ID
@@ -75,7 +75,7 @@ public class OrderController {
 
         // 2. Save each order item with quantity
         for (Order.OrderItem orderItem : order.getItems()) {
-            MenuItem item = orderItem.getMenuItem();
+             Product item = orderItem.getMenuItem();
             int quantity = orderItem.getQuantity();
             
             String itemJson = String.format(
@@ -238,12 +238,12 @@ public class OrderController {
                     
                     if (quantity > 0) {
                         // Get full menu item details
-                        MenuItem fullItem = getMenuItemDetails(itemId);
+                        Product fullItem = getMenuItemDetails(itemId);
                         if (fullItem != null) {
                             order.addItem(fullItem, quantity);
                         } else {
                             // Fallback: create a basic menu item if details can't be fetched
-                            MenuItem fallbackItem = new MenuItem(
+                            Product fallbackItem = new Product(
                                 itemId, 
                                 "Unknown Item (ID: " + itemId + ")", 
                                 "Item details not found", 
@@ -260,7 +260,7 @@ public class OrderController {
         return order;
     }
 
-    private MenuItem getMenuItemDetails(String itemId) 
+    private Product getMenuItemDetails(String itemId) 
             throws IOException, InterruptedException {
         HttpResponse<String> response =
                 SupabaseClient.Tables.MENU_ITEMS_TABLE.get(
@@ -283,7 +283,7 @@ public class OrderController {
         double price = BrowseMenuController.extractDouble(itemObj, "price");
         boolean available = BrowseMenuController.extractBoolean(itemObj, "available");
         
-        return new MenuItem(itemId, name, description, price, available);
+        return new Product(itemId, name, description, price, available);
     }
 
     private List<Order> parseOrders(String json) {

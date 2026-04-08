@@ -1,6 +1,6 @@
 package controller;
 
-import entity.MenuItem;
+import entity.Product;
 import utils.SupabaseClient;
 
 import java.io.IOException;
@@ -10,14 +10,14 @@ import java.util.List;
 
 public class BrowseMenuController {
  
-    public List<MenuItem> retrieveMenuItems() throws IOException, InterruptedException {
+    public List<Product> retrieveMenuItems() throws IOException, InterruptedException {
         HttpResponse<String> response =
                 SupabaseClient.Tables.MENU_ITEMS_TABLE.get("?select=*", null);
  
         return parseMenuItems(response.body());
     }
  
-    public List<MenuItem> retrieveAvailableItems() throws IOException, InterruptedException {
+    public List<Product> retrieveAvailableItems() throws IOException, InterruptedException {
         HttpResponse<String> response =
                 SupabaseClient.Tables.MENU_ITEMS_TABLE.get(
                         "?select=*&available=eq.true", null);
@@ -25,8 +25,8 @@ public class BrowseMenuController {
         return parseMenuItems(response.body());
     }
  
-    private List<MenuItem> parseMenuItems(String json) {
-        List<MenuItem> items = new ArrayList<>();
+    private List<Product> parseMenuItems(String json) {
+        List<Product> items = new ArrayList<>();
         if (json == null || json.equals("[]") || json.isBlank()) return items;
  
         json = json.trim().substring(1, json.length() - 1); 
@@ -36,7 +36,7 @@ public class BrowseMenuController {
             String description = extractString(obj, "description");
             double price       = extractDouble(obj, "price");
             boolean available  = extractBoolean(obj, "available");
-            items.add(new MenuItem(itemId, name, description, price, available));
+            items.add(new Product(itemId, name, description, price, available));
         }
         return items;
     }
