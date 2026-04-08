@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
+import entity.User;
 
 import entity.Customer;
 import entity.User;
@@ -18,7 +19,7 @@ public class AuthenticatorUI {
     private Consumer<String> authSuccessCallback;
     private Consumer<User> authSuccessCustomerCallback;
 
-    public void setAuthSuccessCallback(Consumer<String> authSuccessCallback) {
+    public void setAuthSuccessCallback(Consumer<User> authSuccessCallback) {
         this.authSuccessCallback = authSuccessCallback;
     }
 
@@ -147,7 +148,11 @@ public class AuthenticatorUI {
             if (isAuthenticated) {
                 UIUtils.showMessage(frame, "Success", "Login successful!");
                 String role = auth.getUserRole(username);
+                User user = new User(username, password, role);
+                this.authUsername = username; // Store authenticated username
 
+                if (authSuccessCallback != null) {
+                    authSuccessCallback.accept(user);
                 if ("customer".equals(role) && authSuccessCustomerCallback != null) {
                     Customer customer = new Customer(username, password);
                     authSuccessCustomerCallback.accept(customer);
@@ -158,7 +163,7 @@ public class AuthenticatorUI {
                 }
 
                 frame.setVisible(false);
-
+                
 
             } else {
                 UIUtils.showMessage(frame, "Error", "Invalid credentials.");
@@ -176,4 +181,9 @@ public class AuthenticatorUI {
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
     }
+
+    public String getAuthenticatedUsername() {
+        return authUsername;
+    }
+    
 }
