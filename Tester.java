@@ -3,21 +3,22 @@ import java.util.List;
 import controller.ReportController;
 import controller.UserController;
 import entity.Report;
+import dorkbox.systemTray.SystemTray;
 
 public class Tester {
-    public static void main (String[] args){
-        List<Report> reports = ReportController.generateReports("john_doe");
 
-        System.out.println("Total reports: " + reports.size());
+    public static void main(String[] args) {
 
-        for (Report r : reports) {
-            System.out.println(r); // uses toString()
+        SystemTray tray = SystemTray.get();
+
+        if (tray == null) {
+            System.out.println("Tray not supported");
+            return;
         }
 
-        String Workers = UserController.fetchWorkers();
-        System.out.println(Workers);
-        List<String[]> list = UserController.parseWorkersJson(Workers);
-        System.out.println(list);        
-    
+        tray.setStatus("Task Reminder");
+
+        tray.notify("Reminder", "It finally works 🎉");
     }
 }
+
