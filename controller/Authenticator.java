@@ -129,5 +129,46 @@ public class Authenticator {
         return ""; // Return empty string if user not found or error occurs
     }
 
+    // NEW METHOD: Check if username already exists
+    public boolean usernameExists(String username) {
+        try {
+            HttpResponse<String> response = SupabaseClient.Tables.USERS_TABLE.get(
+                "?username=eq." + SupabaseClient.encodeValue(username) + "&select=username",
+                null);
+
+            if (response.statusCode() == 200) {
+                String body = response.body();
+                return body != null && !body.equals("[]") && !body.isBlank();
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error checking username: " + e.getMessage());
+        }
+        return false;
+    }
+
+    // NEW METHOD: Register a new customer
+    public boolean registerCustomer(String username, String password) {
+        try {
+            // First check if username already exists
+            if (usernameExists(username)) {
+                return false; // Username taken
+            }
+
+            // Create the new customer
+            String jsonBody = String.format(
+                "{\"username\":\"%s\",\"password\":\"%s\",\"role\":\"customer\"}",
+                username, password);
+
+            HttpResponse<String> response = SupabaseClient.Tables.USERS_TABLE.post(
+                jsonBody,
+                null);
+
+            return response.statusCode() >= 200 && response.statusCode() < 300;
+            
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Error registering customer: " + e.getMessage());
+            return false;
+        }
+    }
 
 }
