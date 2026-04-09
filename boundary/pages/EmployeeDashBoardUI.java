@@ -18,7 +18,7 @@ public class EmployeeDashBoardUI {
     private static JPanel contentPanel;
     private String username;
 
-    public void run(User user) {
+    public void run(User user, AuthenticatorUI authUI) {
         this.username = user.getUsername();
         employeeController.clockIn(username);
 
@@ -82,7 +82,7 @@ public class EmployeeDashBoardUI {
         logoutBtn.addActionListener(e -> {
             frame.dispose();
             employeeController.clockOut(username); // Replace with actual username
-            (new AuthenticatorUI()).run();
+            authUI.run();
         });
     }
 

@@ -18,7 +18,7 @@ public class OwnerDashBoardUI {
 
     private static JPanel contentPanel;
 
-    public void run() {
+    public void run(AuthenticatorUI authUI) {
 
         JFrame frame = new JFrame("Director Dashboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -182,7 +182,7 @@ public class OwnerDashBoardUI {
         // Logout
         logoutBtn.addActionListener(e -> {
             frame.dispose();
-            new AuthenticatorUI().run();
+            authUI.run();
         });
     }
 

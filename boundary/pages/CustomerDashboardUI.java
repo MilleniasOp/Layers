@@ -25,9 +25,11 @@ public class CustomerDashboardUI extends JFrame {
     private final JLabel  statusLabel = new JLabel(" ");
 
     private String selectedOrderId = null;
+    private AuthenticatorUI authUI;
 
-    public CustomerDashboardUI(User user) {
+    public CustomerDashboardUI(User user, AuthenticatorUI authUI) {
         this.user = user;
+        this.authUI = authUI;
         buildUI();
     }
 
@@ -98,27 +100,7 @@ public class CustomerDashboardUI extends JFrame {
         // Close the current dashboard
         this.dispose();
         
-        // Create a new authenticator instance
-        SwingUtilities.invokeLater(() -> {
-            AuthenticatorUI authUI = new AuthenticatorUI();
-            
-            // Set up the callbacks again
-            authUI.setAuthSuccessCustomerCallback(customer -> {
-                CustomerDashboardUI customerDashboardUI = new CustomerDashboardUI(customer);
-                customerDashboardUI.run();
-            });
-            
-            authUI.setAuthSuccessCallback(owner -> {
-                OwnerDashBoardUI ownerDashBoardUI = new OwnerDashBoardUI();
-                ownerDashBoardUI.run();
-            });
-            
-            authUI.setAuthSuccessEmployeeCallback(employee -> {
-                JOptionPane.showMessageDialog(null, "Employee UI not implemented yet");
-            });
-            
-            authUI.run();
-        });
+        authUI.run(); 
     }
 }
 
