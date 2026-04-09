@@ -1,13 +1,22 @@
-@startuml Domain Model
+@startuml
+title Domain Model
+
+' --- Styling ---
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
-skinparam roundcorner 5
+skinparam nodesep 80
+skinparam ranksep 80
+skinparam roundcorner 10
+skinparam shadowing false
+
 skinparam class {
     BackgroundColor Beige
     ArrowColor #2A5D9A
     BorderColor #2A5D9A
+    HeaderBackgroundColor #E6D5B8
 }
 
+' --- User Hierarchy ---
 class User {
   - username: String
   - password: String
@@ -24,84 +33,76 @@ class Employee {
 class Owner {
 }
 
-class Attendance {
-  - id: String
-  - username: String
-  - clockIn: String
-  - clockOut: String
-}
-
-class Order {
-  - orderId: String
-  - username: String
-  - items: List<OrderItem>
-  - status: Status
-  - totalPrice: double
-  - placedAt: String
-}
-
-class OrderItem {
-  - menuItem: Product
-  - quantity: int
-}
-
-class Product {
-  - itemId: String
-  - name: String
-  - description: String
-  - price: double
-  - available: boolean
-}
-
-class Recipe {
-  - recipeId: String
-  - productName: String
-  - ingredients: List<String>
-  - measurements: List<String>
-}
-
-class Task {
-  - taskId: String
-  - description: String
-  - assignedTo: String
-  - status: String
-  - createdDate: LocalDateTime
-  - completedPeriod: String
-}
-
-class Report {
-  - ReportID: String
-  - taskId: String
-  - description: String
-  - assignedTo: String
-  - status: String
-  - createdDate: LocalDateTime
-}
-
-class Payroll {
-  - username: String
-  - tasksCompleted: int
-  - totalhours: int
-  - taskPay: double
-  - attendancePay: double
-  - totalPay: double
-  - period: String
-}
-
 User <|-- Customer
 User <|-- Employee
 User <|-- Owner
 
-Customer "1" --> "0..*" Order : places 
-Order "1" --> "1..*" OrderItem : contains 
+' --- Sales & Inventory Cluster ---
+together {
+    class Product {
+      - itemId: String
+      - name: String
+      - price: double
+      - available: boolean
+    }
+    
+    class Recipe {
+      - recipeId: String
+      - productName: String
+      - ingredients: List<String>
+    }
+    
+    class Order {
+      - orderId: String
+      - status: Status
+      - totalPrice: double
+    }
+    
+    class OrderItem {
+      - quantity: int
+    }
+}
+
+' --- Operations & HR Cluster ---
+together {
+    class Task {
+      - taskId: String
+      - description: String
+      - status: String
+    }
+    
+    class Report {
+      - ReportID: String
+    }
+    
+    class Attendance {
+      - clockIn: String
+      - clockOut: String
+    }
+    
+    class Payroll {
+      - totalPay: double
+      - period: String
+    }
+}
+
+' --- Relationships ---
+
+' Sales Flow
+Customer "1" -- "0..*" Order : places 
+Order "1" *-- "1..*" OrderItem : contains 
 OrderItem "1" --> "1" Product : references 
+Recipe "1..*" -- "1" Product : defines 
 
-Recipe "1..*" --> "1" Product : for 
+' Staff & Operations
+Employee "1" -- "0..*" Task : assigned to 
+Employee "1" -- "0..*" Attendance : records 
+Employee "1" -- "0..*" Payroll : receives 
+Report "1" -- "1" Task : documents 
 
-Employee "1" --> "0..*" Task : assigned to
-Report "1" --> "1" Task : contains
-
-Employee "1" --> "0..*" Attendance : has 
-Employee "1" --> "0..*" Payroll : has 
+' Owner Authority (Consolidated)
+Owner "1" --> "1..*" Task : manages 
+Owner "1" --> "1..*" Product : manages 
+Owner "1" --> "1..*" Payroll : calculates 
 
 @enduml
