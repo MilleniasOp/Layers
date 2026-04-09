@@ -1,0 +1,55 @@
+@startuml Use Case Diagram
+
+left to right direction
+
+actor Customer
+actor Employee
+actor Owner
+
+rectangle "Layers N.E.X.U.S" #Beige {
+    rectangle "Customer Functions" {
+        usecase "Browse Menu" as BrowseMenu
+        usecase "Place Order" as PlaceOrder
+        usecase "View Order History" as ViewOrderHistory
+        usecase "Cancel Order" as CancelOrder
+    }
+
+    rectangle "Employee Functions" {
+        usecase "Clock In/Out" as ClockInOut
+        usecase "View Assigned Tasks" as ViewTasks
+        usecase "Update Task Status" as CompleteTasks
+        
+    }
+
+    rectangle "Owner Functions" {
+        usecase "Manage Products" as ManageProducts
+        usecase "Manage Recipes" as ManageRecipes
+        usecase "Manage Employees" as ManageEmployees
+        usecase "Manage Finances" as ViewFinances
+        usecase "Generate Reports" as GenerateReports
+        usecase "Create Tasks" as CreateTask
+        usecase "Assign Tasks" as AssignTask
+
+        
+    }
+}
+
+Customer --> BrowseMenu
+Customer --> PlaceOrder
+Customer --> CancelOrder
+Customer --> ViewOrderHistory
+
+Employee --> ClockInOut
+Employee --> ViewTasks
+Employee --> CompleteTasks
+Employee --> CancelOrder
+
+Owner --> ManageProducts
+Owner --> ManageRecipes
+Owner --> ManageEmployees
+Owner --> ViewFinances
+Owner --> GenerateReports
+Owner --> CreateTask
+Owner --> AssignTask
+
+@enduml
