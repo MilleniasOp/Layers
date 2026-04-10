@@ -56,10 +56,24 @@ public class AuthenticatorUI {
         background.setLayout(new GridBagLayout());
 
         // Card Panel
-        JPanel card = new JPanel();
+        JPanel card = new JPanel(){
+            protected void paintComponent(Graphics g){
+                super.paintComponent(g);
+                Graphics2D g2 = (Graphics2D) g;
+
+                g2.setColor (new Color(0,0,0,50));
+                g2.fillRoundRect (0,0,getWidth() - 8, getHeight() -8,30,30);
+
+                g2.setColor(new Color(255,255,255,180));
+                g2.fillRoundRect(0,0,getWidth() -10, getHeight() -10,30,30);
+
+
+            }
+        };
+        card.setOpaque(false);
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(new Color(30, 30, 30));
-        card.setBorder(new EmptyBorder(25, 35, 25, 35));
+
+        card.setBorder(new EmptyBorder(70,70,70,70));
 
         // Title
         JLabel title = new JLabel("Welcome Back");
@@ -69,22 +83,32 @@ public class AuthenticatorUI {
 
         // Username
         JLabel userLabel = new JLabel("Username");
-        userLabel.setForeground(Color.LIGHT_GRAY);
+        userLabel.setForeground(Color.DARK_GRAY);
+        userLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userLabel.setMaximumSize(new Dimension(300, 35));
+
         JTextField userText = new JTextField();
+        userText.setAlignmentX(Component.LEFT_ALIGNMENT);
+        userText.setMaximumSize(new Dimension(300, 40));
         styleTextField(userText);
 
+        
         // Password Panel (for toggle)
         JLabel passLabel = new JLabel("Password");
-        passLabel.setForeground(Color.LIGHT_GRAY);
+        passLabel.setForeground(Color.DARK_GRAY);
+        passLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        passLabel.setMaximumSize(new Dimension(300, 35));
 
         JPanel passPanel = new JPanel(new BorderLayout());
-        passPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+        passPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        passPanel.setMaximumSize(new Dimension(300, 35));
         passPanel.setBackground(new Color(50, 50, 50));
 
         JPasswordField passwordText = new JPasswordField();
         passwordText.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         passwordText.setBackground(new Color(50, 50, 50));
         passwordText.setForeground(Color.WHITE);
+        passwordText.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
         JButton toggle = new JButton("👁");
         toggle.setFocusPainted(false);
@@ -143,19 +167,40 @@ public class AuthenticatorUI {
             }
         });
 
+        JPanel wrapperUser = new JPanel (new BorderLayout());
+        wrapperUser.setOpaque(false);
+        wrapperUser.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
+        wrapperUser.add(userText,BorderLayout.CENTER);
+        userText.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel wrapperPassword = new JPanel (new BorderLayout());
+        wrapperPassword.setOpaque(false);
+        wrapperPassword.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
+        wrapperPassword.add(passPanel,BorderLayout.CENTER);
+
+        JPanel wrapperUserLabel = new JPanel (new BorderLayout());
+        wrapperUserLabel.setOpaque(false);
+        wrapperUserLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
+        wrapperUserLabel.add(userLabel,BorderLayout.WEST);
+
+        JPanel wrapperPasswordLabel = new JPanel (new BorderLayout());
+        wrapperPasswordLabel.setOpaque(false);
+        wrapperPasswordLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
+        wrapperPasswordLabel.add(passLabel,BorderLayout.WEST);
+
         // Layout spacing
         card.add(title);
         card.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        card.add(userLabel);
+        card.add(wrapperUserLabel);
         card.add(Box.createRigidArea(new Dimension(0, 5)));
-        card.add(userText);
+        card.add(wrapperUser);
 
         card.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        card.add(passLabel);
+        card.add(wrapperPasswordLabel);
         card.add(Box.createRigidArea(new Dimension(0, 5)));
-        card.add(passPanel);
+        card.add(wrapperPassword);
 
         card.add(Box.createRigidArea(new Dimension(0, 20)));
         card.add(loginButton);
