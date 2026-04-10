@@ -3,6 +3,7 @@ import controller.AttendanceController;
 import controller.TaskController;
 import entity.Task;
 import entity.Employee;
+import entity.User;
 import java.util.List;
 
 public class EmployeeController {
@@ -18,7 +19,7 @@ public class EmployeeController {
     }
 
     //Viewing tasks assigned to employee
-    public List<Task> viewTasksAssigned (Employee employee){
+    public List<Task> viewTasksAssigned (User employee){
         return TaskController.getTasksFromSupabase(employee);
     }
 
@@ -28,4 +29,23 @@ public class EmployeeController {
         controller.updateTask (task,employee, newStatus);
     }
 
+    public String taskReminder(User employee) throws Exception {
+
+        StringBuilder pendingTasks = new StringBuilder();
+
+        for (Task task : viewTasksAssigned(employee)) {
+            if (task.getStatus().equals("Pending") || task.getStatus().equals("In Progress")) {
+                pendingTasks.append(" - ").append(task.getDescription()).append("\n");
+            }
+        }
+
+        String taskList = pendingTasks.toString();
+        System.out.println(taskList);
+        if (taskList.length() == 0) {
+            return "No reminders.";
+        } else {
+            return taskList;
+        }
+        
+    }
 }
