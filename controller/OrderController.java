@@ -2,6 +2,7 @@ package controller;
 
 import entity.Product;
 import entity.Order;
+import entity.User;
 import utils.SupabaseClient;
 
 import java.io.IOException;
@@ -114,8 +115,10 @@ public class OrderController {
         return parseOrders(response.body());
     }
 
-    public String cancelOrder(String orderId, String username)
+    public String cancelOrder(String orderId, User user)
             throws IOException, InterruptedException {
+
+        String username = user.getUsername();
 
         HttpResponse<String> response =
                 SupabaseClient.Tables.ORDERS_TABLE.get(
@@ -130,16 +133,16 @@ public class OrderController {
         String status        = BrowseMenuController.extractString(body, "status");
         String placedAt      = BrowseMenuController.extractString(body, "placed_at");
 
-        if (!ownerUsername.equals(username)) {
+        if (!"employee".equals(user.getRole()) && !ownerUsername.equals(username)) {
             return "ERROR: You can only cancel your own orders.";
         }
-        if ("CONFIRMED".equals(status)) {
+        if (!"employee".equals(user.getRole()) && "CONFIRMED".equals(status)) {
             return "ERROR: Confirmed orders cannot be cancelled.";
         }
         if ("CANCELLED".equals(status)) {
             return "ERROR: This order is already cancelled.";
         }
-        if (!isWithinWindow(placedAt)) {
+        if (!"employee".equals(user.getRole()) && !isWithinWindow(placedAt)) {
             return "Order can no longer be cancelled (5-minute window has passed).";
         }
 
@@ -288,7 +291,7 @@ public class OrderController {
         return new Product(itemId, name, description, price, available);
     }
 
-    private List<Order> parseOrders(String json) {
+    public static List<Order> parseOrders(String json) {
         List<Order> orders = new ArrayList<>();
         if (json == null || json.equals("[]") || json.isBlank()) return orders;
 
@@ -319,5 +322,21 @@ public class OrderController {
             orders.add(o);
         }
         return orders;
+    }
+
+    public static String fetchOrders() throws IOException, InterruptedException {
+        HttpResponse<String> response = SupabaseClient.Tables.ORDERS_TABLE.get("?select=*&order=placed_at.desc", null);
+        return response.body();
+    }
+
+    public static List<String[]> parseOrdersJson(String json) {
+        List<Order> orders = OrderController.parseOrders(json);
+        List<String[]> result = new ArrayList<>();
+        for (Order o : orders) {
+            if (!"CANCELLED".equals(o.getStatus().toString())) {
+                result.add(new String[]{o.getOrderId(), o.getUsername(), o.getStatus().toString(), String.format("%.2f", o.getTotalPrice()), o.getPlacedAt()});
+            }
+        }
+        return result;
     }
 }

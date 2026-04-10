@@ -3,6 +3,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import boundary.tabs.EmployeeTaskUI;
+import boundary.tabs.OrderUI;
 import boundary.tabs.TaskUI;
 import controller.EmployeeController;
 import entity.Employee;
@@ -51,9 +52,12 @@ public class EmployeeDashBoardUI {
         title.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JButton taskBtn = createSidebarButton("My Tasks");
+        JButton OrderBtn = createSidebarButton("Orders");
 
         sidebar.add(title);
         sidebar.add(taskBtn);
+        sidebar.add(OrderBtn);
+
 
         // Top bar
         JPanel topbar = new JPanel(new BorderLayout());
@@ -103,6 +107,10 @@ public class EmployeeDashBoardUI {
         // Navigation logic
         taskBtn.addActionListener(e -> switchPanel(createPage("Task Management", "Open Task UI", () -> {
             switchPanel(EmployeeTaskUI.createTaskPanel(user));
+        })));
+
+        OrderBtn.addActionListener(e -> switchPanel(createPage("Order Management", "Open Order UI", () -> {
+            switchPanel(OrderUI.createOrderPanel(user));
         })));
 
         logoutBtn.addActionListener(e -> {

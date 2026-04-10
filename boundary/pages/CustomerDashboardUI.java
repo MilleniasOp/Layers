@@ -280,7 +280,7 @@ public class CustomerDashboardUI extends JFrame {
                 String orderId = chosen.split("\\s*\\|")[0].trim();
 
                 runAsync("Cancelling…", () -> {
-                    String msg = orderCtrl.cancelOrder(orderId, user.getUsername());
+                    String msg = orderCtrl.cancelOrder(orderId, user);
                     SwingUtilities.invokeLater(() -> {
                         JOptionPane.showMessageDialog(this, msg,
                                 msg.startsWith("SUCCESS") ? "Success" : "Notice",
