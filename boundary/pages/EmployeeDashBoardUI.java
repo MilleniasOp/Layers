@@ -82,7 +82,6 @@ public class EmployeeDashBoardUI {
 
         contentPanel.add(homePanel, BorderLayout.CENTER);
 
-        // NOW load reminders and update the label when ready
         EventQueue.invokeLater(() -> {
             try {
                 reminders = employeeController.taskReminder(user);
