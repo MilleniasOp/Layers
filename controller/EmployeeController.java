@@ -42,7 +42,7 @@ public class EmployeeController {
         String taskList = pendingTasks.toString();
         System.out.println(taskList);
         if (taskList.length() == 0) {
-            return "No reminders.";
+            return " No reminders.";
         } else {
             return taskList;
         }
