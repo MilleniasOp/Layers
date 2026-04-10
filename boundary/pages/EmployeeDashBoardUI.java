@@ -17,10 +17,19 @@ public class EmployeeDashBoardUI {
     EmployeeController employeeController = new EmployeeController();
     private static JPanel contentPanel;
     private String username;
+    private static String reminders;
 
     public void run(User user, AuthenticatorUI authUI) {
         this.username = user.getUsername();
         employeeController.clockIn(username);
+        EventQueue.invokeLater(() -> { try {
+            reminders = employeeController.taskReminder(user);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            System.out.println("Failed to send task reminder notification");
+        }});
+
 
         JFrame frame = new JFrame("Employee Dashboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -64,7 +73,25 @@ public class EmployeeDashBoardUI {
         contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(new Color(240, 244, 248));
 
-        contentPanel.add(createHomePanel(), BorderLayout.CENTER);
+        JLabel reminderLabel = new JLabel("Reminders: Loading...");
+        reminderLabel.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+
+        JPanel homePanel = new JPanel(new GridBagLayout());
+        homePanel.setBackground(new Color(240, 244, 248));
+        homePanel.add(reminderLabel);
+
+        contentPanel.add(homePanel, BorderLayout.CENTER);
+
+        // NOW load reminders and update the label when ready
+        EventQueue.invokeLater(() -> {
+            try {
+                reminders = employeeController.taskReminder(user);
+                reminderLabel.setText("Reminders:" + reminders);
+            } catch (Exception e) {
+                e.printStackTrace();
+                reminderLabel.setText("Reminders: Failed to load");
+            }
+        });
 
         // Layout assembly
         mainPanel.add(sidebar, BorderLayout.WEST);
@@ -81,7 +108,7 @@ public class EmployeeDashBoardUI {
 
         logoutBtn.addActionListener(e -> {
             frame.dispose();
-            employeeController.clockOut(username); // Replace with actual username
+            employeeController.clockOut(username);
             authUI.run();
         });
     }
@@ -115,18 +142,6 @@ public class EmployeeDashBoardUI {
         contentPanel.add(panel, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
-    }
-
-    // Home panel
-    private static JPanel createHomePanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(new Color(240, 244, 248));
-
-        JLabel label = new JLabel("Select an option from the sidebar");
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 18));
-
-        panel.add(label);
-        return panel;
     }
 
     // Generic page layout
