@@ -1,46 +1,31 @@
 package entity;
-public class Product {
+
+public class Product{
+
+    private String itemId;
     private String name;
-    private float cost;
-
-    /**
-     * Default constructor
-     */
-    public Product() {
-        this.name = "";
-        this.cost = 0;
+    private String description;
+    private double price;
+    private boolean available;
+    
+    public Product(String itemId, String name, String description, double price, boolean available) {
+            this.itemId      = itemId;
+            this.name        = name;
+            this.description = description;
+            this.price       = price;
+            this.available   = available;
+        }
+    
+        public String  getItemId() {return itemId;}
+        public String  getName() {return name;}
+        public String  getDescription() {return description;}
+        public double  getPrice() {return price;}
+        public boolean isAvailable() {return available;}
+        public void    setAvailable(boolean available) {this.available = available;} 
+    
+        @Override
+        public String toString() {
+            return String.format("[%s] %s - $%.2f (%s)",
+                    itemId, name, price, available ? "Available" : "Unavailable");
     }
-
-    /**
-     * Constructor with name and cost
-     * @param name the product name
-     * @param cost the product cost
-     */
-    public Product(String name, float cost) {
-        this.name = name;
-        this.cost = cost;
-    }
-    // Getters
-    public String getName() {
-        return name;
-    }
-
-    public float getCost() {
-        return cost;
-    }
-
-    // Setters
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setCost(float cost) {
-        this.cost = cost;
-    }
-
-    @Override
-    public String toString() {
-        return name + " - $" + String.format("%.2f", cost);
-    }
-
 }
